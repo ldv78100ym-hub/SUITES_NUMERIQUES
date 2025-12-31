@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suites Numériques - Version Intégrale Exhaustive</title>
+    
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --accent: #e67e22;
+            --success: #16a34a;
+            --bg: #f8fafc;
+            --paper: #fff9f0;
+        }
+
+        body { font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: var(--bg); }
+        h1 { color: var(--primary); text-align: center; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
+        
+        .section { background: white; padding: 25px; margin-bottom: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        h2 { color: var(--secondary); margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        
+        .formula { background: #f1f5f9; padding: 15px; border-left: 5px solid var(--secondary); margin: 15px 0; font-size: 1.2em; border-radius: 0 8px 8px 0; min-height: 60px; display: flex; align-items: center; }
+        
+        .chart-container { 
+            position: relative;
+            background-color: var(--paper); 
+            border: 2px solid #d4c4a8;
+            border-radius: 8px;
+            height: 400px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        canvas#millimeterPaper { width: 100%; height: 100%; cursor: crosshair; }
+
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-generate { background-color: var(--success); color: white; }
+        .btn-generate:hover { background-color: #15803d; transform: translateY(-1px); }
+        .btn-secondary { background-color: #64748b; color: white; margin-top: 10px; }
+
+        /* Modal / Popup */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); }
+        .modal-content { 
+            background: white; position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+            padding: 0; border-radius: 12px; width: 90%; max-width: 500px; 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); border: 1px solid #cbd5e1;
+        }
+        #modalHeader { cursor: move; padding: 15px; background: #f1f5f9; border-radius: 12px 12px 0 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: var(--primary); }
+        .modal-body { padding: 25px; text-align: center; }
+        .result-box { margin: 15px 0; padding: 15px; background: #f8fafc; border: 1px dashed var(--secondary); border-radius: 8px; font-size: 1.3em; }
+        
+        .info-rang { background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <button id="copyright-btn" class="btn btn-secondary">ℹ️ Infos & Licence</button>
+    <div id="copyright-content" style="display: none; margin: 15px 0; padding: 15px; background: #eee; border-radius: 8px; font-size: 0.9em;">
+        <strong>Auteur :</strong> Yann Merdy | <strong>Date :</strong> Décembre 2025 | Usage éducatif autorisé.
+    </div>
+
+    <h1>Modes de définition d'une suite numérique</h1>
+
+    <div class="section">
+        <h2>1. Par liste exhaustive</h2>
+        <div class="formula" id="main-list">
+            \(u = (1~;~ \sqrt{3}~;~ -1~;~ \dfrac{5}{7}~;~ -9~;~ 6~;~ 5)\)
+        </div>
+        <button class="btn btn-generate" onclick="generateList()">🎲 Nouvelle liste & Exercice</button>
+    </div>
+
+    <div class="section">
+        <h2>2. Par des points dans un graphique</h2>
+        <p>Les points ne sont <b>jamais reliés</b> car l'indice \(n\) est un entier naturel.</p>
+        <div class="chart-container">
+            <canvas id="millimeterPaper"></canvas>
+        </div>
+        <button class="btn btn-generate" onclick="generateGraph()">🎲 Nouveau nuage & Exercice</button>
+    </div>
+
+    <div class="section">
+        <h2>3. Formule explicite (Polynômes, Rationnelles, Racines, Trigo, Expo)</h2>
+        <p>On calcule directement n'importe quel terme à partir de son rang \(n\).</p>
+        <div class="formula" id="form-explicite">\(u_n = 3n^2 - 5n + 1\)</div>
+        <button class="btn btn-generate" onclick="generateExplicite()">🎲 Nouvelle formule & Exercice</button>
+    </div>
+
+    <div class="section">
+        <h2>4. Relation de récurrence (de proche en proche)</h2>
+        <p>On calcule un terme à partir du terme précédent.</p>
+        <div class="formula" id="form-recurrence">\(\begin{cases} u_0 = 2 \\ u_{n+1} = u_n + 3 \end{cases}\)</div>
+        <button class="btn btn-generate" onclick="generateRecurrence()">🎲 Nouvelle récurrence & Exercice</button>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div id="draggableModal" class="modal-content">
+            <div id="modalHeader">🛠️ Générateur d'exercice</div>
+            <div class="modal-body">
+                <div id="modalInfo"></div>
+                <div id="modalMath" class="result-box"></div>
+                <div id="modalInteraction"></div>
+                <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales pour la synchronisation
+        const modal = document.getElementById("resultModal");
+        const dragElem = document.getElementById("draggableModal");
+        const canvas = document.getElementById('millimeterPaper');
+        const ctx = canvas.getContext('2d');
+        
+        let graphState = { points: [], startIdx: 0, scaleX: 40, scaleY: 40, offsetX: 80, offsetY: 200 };
+	const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        
+	function fmtSign(val, isFirst = false) {
+    		if (val === 0) return isFirst ? "0" : ""; // Optionnel : on peut retourner " + 0" ou rien
+    			if (val > 0) {
+        			return isFirst ? `${val}` : ` + ${val}`;
+			    } else {
+        			// Pour un nombre négatif, on affiche " - " suivi de la valeur absolue
+			        return isFirst ? `${val}` : ` - ${Math.abs(val)}`;
+    		}
+	}
+
+        // --- GESTION DU GRAPHIQUE (Papier millimétré de GENERALITES.html) ---
+        function drawGraph() {
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            
+            // Grille millimétrée
+            for(let x = 0; x <= w; x += 4) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h);
+                ctx.strokeStyle = (x % 40 === 0) ? 'rgba(211, 84, 0, 0.5)' : (x % 20 === 0 ? 'rgba(211, 84, 0, 0.2)' : 'rgba(211, 84, 0, 0.08)');
+                ctx.lineWidth = (x % 40 === 0) ? 1.5 : 0.5; ctx.stroke();
+            }
+            for(let y = 0; y <= h; y += 4) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y);
+                ctx.strokeStyle = (y % 40 === 0) ? 'rgba(211, 84, 0, 0.5)' : (y % 20 === 0 ? 'rgba(211, 84, 0, 0.2)' : 'rgba(211, 84, 0, 0.08)');
+                ctx.lineWidth = (y % 40 === 0) ? 1.5 : 0.5; ctx.stroke();
+            }
+
+            const ox = graphState.offsetX, oy = graphState.offsetY;
+            
+            // Axes
+            ctx.beginPath(); ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2;
+            ctx.moveTo(0, oy); ctx.lineTo(w, oy); ctx.moveTo(ox, 0); ctx.lineTo(ox, h); ctx.stroke();
+
+            // Graduation X
+            ctx.fillStyle = '#1e293b'; ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            for (let n = 0; n <= 20; n++) {
+                const xPos = ox + n * graphState.scaleX;
+                if (xPos <= w) ctx.fillText(graphState.startIdx + n, xPos, oy + 8);
+            }
+            
+            // Graduation Y
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            for (let v = -10; v <= 10; v++) {
+                if (v === 0) continue; 
+                const yPos = oy - v * graphState.scaleY;
+                if (yPos >= 0 && yPos <= h) ctx.fillText(v, ox - 8, yPos);
+            }
+
+            // Points
+            graphState.points.forEach(p => {
+                const dx = ox + (p.x - graphState.startIdx) * graphState.scaleX;
+                const dy = oy - (p.y * graphState.scaleY);
+                ctx.beginPath(); ctx.fillStyle = '#ef4444'; ctx.arc(dx, dy, 5, 0, Math.PI*2); ctx.fill();
+                // Rappels pointillés
+                ctx.setLineDash([2, 2]); ctx.strokeStyle = '#94a3b8';
+                ctx.beginPath(); ctx.moveTo(dx, oy); ctx.lineTo(dx, dy); ctx.stroke();
+            });
+            ctx.setLineDash([]);
+        }
+
+        // --- GÉNÉRATEUR 1 : LISTE (Algorithme V1 + Synchro V2) ---
+        function generateList() {
+            const size = 7, startIdx = Math.random() < 0.5 ? 0 : 1;
+            let currentList = [];
+            for(let i=0; i<size; i++) {
+                const r = Math.floor(Math.random()*4);
+                if(r===0) currentList.push((Math.floor(Math.random()*30)-15).toString());
+                else if(r===1) currentList.push(`\\\\dfrac{${Math.floor(Math.random()*9)+1}}{${Math.floor(Math.random()*5)+2}}`);
+                else if(r===2) currentList.push(`\\\\sqrt{${[2,3,5,7][Math.floor(Math.random()*4)]}}`);
+                else currentList.push((Math.random()*10-5).toFixed(1).replace('.',','));
+            }
+
+            const formulaDisplay = currentList.join('~;~').replace(/\\\\/g, '\\');
+            document.getElementById('main-list').innerHTML = `\\(u = (${formulaDisplay})\\)`;
+            
+            const randIdx = startIdx + Math.floor(Math.random()*size);
+            const sol = currentList[randIdx-startIdx];
+            
+            openModal("Liste exhaustive", 
+                `<span class="info-rang">Premier indice n = ${startIdx}</span>`,
+                `Trouver \\(u_{${randIdx}}\\)`,
+                `<button class="btn btn-generate" onclick="this.innerHTML='Réponse : \\\\(${sol}\\\\)'; MathJax.typesetPromise();">Solution</button>`
+            );
+        }
+
+        // --- GÉNÉRATEUR 2 : GRAPHIQUE (Algorithme V1 + Synchro V2) ---
+        function generateGraph() {
+            const size = 8, startIdx = Math.random() < 0.5 ? 0 : 1;
+            graphState.startIdx = startIdx;
+            graphState.points = [];
+            for(let i=0; i<size; i++) {
+                let val = (Math.floor(Math.random()*14)-7) * 0.5;
+                graphState.points.push({x: startIdx + i, y: val});
+            }
+            drawGraph();
+
+            const target = graphState.points[Math.floor(Math.random()*size)];
+            const solVal = target.y.toString().replace('.',',');
+            
+            openModal("Analyse Graphique", 
+                `<span class="info-rang">Papier millimétré (1 unité = 40px)</span>`,
+                `Quelle est la valeur de \\(u_{${target.x}}\\)?`,
+                `<button class="btn btn-generate" onclick="this.innerHTML='Réponse : \\\\(u_{${target.x}} = ${solVal}\\\\)'; MathJax.typesetPromise();">Solution</button>`
+            );
+        }
+
+        // --- GÉNÉRATEUR 3 : EXPLICITE (Algorithme Expert V1 + Synchro V2) ---
+        function generateExplicite() {
+            const type = Math.floor(Math.random() * 5);
+            let formulaLaTeX = ""; let solutionVal = "";
+            let n = Math.floor(Math.random() * 4) + 1;
+            const fmt = (val) => val >= 0 ? "+ " + val : val;
+            
+
+            if (type === 0) { // POLYNOMES (Degré 0 à 3)
+                const deg = rand(1, 3);
+                if (deg === 1) {
+                    const a = rand(-5, 5) || 1, b = rand(-5, 5);
+                    formulaLaTeX = `${a}n ${fmt(b)}`; solutionVal = a*n + b;
+                } else if (deg === 2) {
+                    const a = rand(-2, 2) || 1, b = rand(-4, 4), c = rand(-5, 5);
+                    formulaLaTeX = `${a===1?'':(a===-1?'-':a)}n^2 ${b===0?'':fmt(b)+'n'} ${c===0?'':fmt(c)}`;
+                    solutionVal = a*n*n + b*n + c;
+                } else {
+                    const a = rand(-1, 1) || 1, c = rand(-3, 3);
+                    formulaLaTeX = `${a===1?'':'-'}n^3 ${fmt(c)}`; solutionVal = Math.pow(n,3)*a + c;
+                }
+            } 
+            else if (type === 1) { // RATIONNELLE
+                const a = rand(1, 4), b = rand(-3, 3), d = rand(1, 3);
+                formulaLaTeX = `\\\\dfrac{${a}n ${fmt(b)}}{n + ${d}}`;
+                const num = a*n + b, den = n + d;
+                solutionVal = (num % den === 0) ? (num/den) : `\\\\dfrac{${num}}{${den}}`;
+            } 
+            else if (type === 2) { // RACINE CARREE
+                const a = rand(1, 3), b = rand(0, 5);
+                formulaLaTeX = `\\\\sqrt{${a}n + ${b}}`;
+                const rad = a*n + b;
+                solutionVal = Number.isInteger(Math.sqrt(rad)) ? Math.sqrt(rad) : `\\\\sqrt{${rad}}`;
+            } 
+            else if (type === 3) { // TRIGONOMETRIE
+                n = rand(0, 3);
+                formulaLaTeX = `2\\\\cos(n\\\\pi) + n`;
+                solutionVal = 2 * Math.cos(n * Math.PI) + n;
+            }
+            else { // EXPONENTIELLE
+                const b = rand(2, 3), a = rand(1, 5);
+                formulaLaTeX = `${a} \\\\times ${b}^n`;
+                solutionVal = a * Math.pow(b, n);
+            }
+
+            document.getElementById('form-explicite').innerHTML = `\\(u_n = ${formulaLaTeX.replace(/\\\\/g, '\\')}\\)`;
+            
+            openModal("Calcul Explicite", 
+                `<span class="info-rang">Remplacer n par ${n}</span>`,
+                `Calculer \\(u_{${n}}\\)`,
+                `<button class="btn btn-generate" onclick="this.innerHTML='Résultat : \\\\(${solutionVal.toString().replace('.',',')}\\\\)'; MathJax.typesetPromise();">Solution</button>`
+            );
+        }
+
+        // --- GÉNÉRATEUR 4 : RÉCURRENCE (Synchro V2) ---
+        function generateRecurrence() {
+    const type = Math.floor(Math.random() * 5);
+    // On définit aléatoirement si la suite commence à u0 ou u1
+    const startRank = Math.random() < 0.5 ? 0 : 1; 
+    
+    let formulaStr = "";
+    let solText = "";
+    let questionText = "";
+
+    switch(type) {
+        case 0: // Polynôme
+            const val_init0 = rand(-10, 10); const c0 = rand(-10, 10);
+            formulaStr = `\\begin{cases} u_{${startRank}} = ${val_init0} \\\\ u_{n+1} = u_n^2 ${c0 >= 0 ? '+ ' + c0 : c0} \\end{cases}`;
+            const u_next1_0 = val_init0**2 + c0; const u_next2_0 = u_next1_0**2 + c0;
+            solText = `u_{${startRank + 1}} = ${u_next1_0}, u_{${startRank + 2}} = ${u_next2_0}`;
+            questionText = `Calculer \\(u_{${startRank + 1}}\\) et \\(u_{${startRank + 2}}\\).`;
+            break;
+
+        case 1: // Rationnelle
+    	    const val_init1 = rand(-10, 10); 
+    	    const a1 = rand(-10, 10);
+	    const a2 = rand(-10, 10);
+    	    const a3 = rand(-10, 10);
+    	    const a4 = rand(-10, 10);
+
+    	    // Construction propre des chaînes de caractères
+    	    // On utilise fmtSign pour a2 et a4 car ils ne sont pas en début d'expression
+    	    let numStr = `${a1}u_n ${fmtSign(a2)}`; 
+    	    let denStr = `${a3}u_n ${fmtSign(a4)}`;
+
+	    formulaStr = `\\begin{cases} u_{${startRank}} = ${val_init1} \\\\ u_{n+1} = \\dfrac{${numStr}}{${denStr}} \\end{cases}`;
+    
+    	    // Calcul du résultat numérique pour la solution
+    	    const resNum = a1 * val_init1 + a2;
+            const resDen = a3 * val_init1 + a4;
+    
+            if (resDen === 0) { generateRecurrence(); return; } // Sécurité division par zéro
+    
+            const u_next1_1 = resNum / resDen;
+            solText = `u_{${startRank + 1}} = ${u_next1_1.toFixed(2).replace('.', ',')}`;
+            questionText = `Calculer \\(u_{${startRank + 1}}\\).`;
+            break;
+
+        case 2: // Racine carrée
+            const val_init2 = rand(4, 10); const k1 = rand(1,10); const k2 = rand(1, 5);
+            formulaStr = `\\begin{cases} u_{${startRank}} = ${val_init2} \\\\ u_{n+1} = \\sqrt{${k1}u_n + ${k2}} \\end{cases}`;
+            solText = `u_{${startRank + 1}} = \\\\sqrt{${k1*val_init2 + k2}}`;
+            questionText = `Calculer \\(u_{${startRank + 1}}\\).`;
+            break;
+
+        case 3: // Puissance
+            const val_init3 = rand(0, 2); const b2 = rand(-10,10); const b3 = rand(-10, 10);
+            formulaStr = `\\begin{cases} u_{${startRank}} = ${val_init3} \\\\ u_{n+1} = ${b2} \\times (${b3})^{u_n} \\end{cases}`;
+            const u_next1_3 = 2 * Math.pow(b3, val_init3); const u_next2_3 = b2 * Math.pow(b3, u_next1_3);
+            solText = `u_{${startRank + 1}} = ${u_next1_3}, u_{${startRank + 2}} = ${u_next2_3}`;
+            questionText = `Calculer \\(u_{${startRank + 1}}\\) et \\(u_{${startRank + 2}}\\).`;
+            break;
+
+        case 4: // Ordre supérieur
+            const val_init4_0 = rand(-10,10); const val_init4_1 = rand(-10,10);
+            const f1 = rand(-10,10); const f2 = rand(-10,10);
+            if(Math.random() < 0.5) {
+                // Type Fibonacci
+		let numUn = `${f1}u_{n+1} ${fmtSign(f2)}u_n`; 
+                formulaStr = `\\begin{cases} u_{${startRank}} = ${val_init4_0}, u_{${startRank+1}} = ${val_init4_1} \\\\ u_{n+2} = ${numUn} \\end{cases}`;
+		const u_next = f1*val_init4_0+f2*val_init4_1;
+                solText = `u_{${startRank+2}} = ${u_next}`;
+                questionText = `Calculer \\(u_{${startRank + 2}}\\).`;
+            } else {
+                // Tribonacci
+                formulaStr = `\\begin{cases} u_{${startRank}} = 1, u_{${startRank+1}} = 1, u_{${startRank+2}} = 1 \\\\ u_{n+3} = u_{n+2} + u_{n+1} + u_n \\end{cases}`;
+                solText = `u_{${startRank+3}} = 3`;
+                questionText = `Calculer \\(u_{${startRank + 3}}\\).`;
+            }
+            break;
+    }
+
+    document.getElementById('form-recurrence').innerHTML = `\\(${formulaStr}\\)`;
+    if(window.MathJax) MathJax.typesetPromise();
+    
+    openModal("Relation de Récurrence",
+    `<span class="info-rang">Premier indice n = ${startRank}</span>`,
+    `\\(${formulaStr}\\)`,
+    `<p>${questionText}</p><button class="btn btn-generate" onclick="this.innerHTML='Solution : \\\\(${solText}\\\\)'; MathJax.typesetPromise();">Voir solution</button>`
+);
+
+
+    document.getElementById('form-recurrence').innerHTML = `\\(${formulaStr}\\)`;
+    if(window.MathJax) MathJax.typesetPromise();
+    
+    // Le popup s'ouvrira maintenant correctement
+    openModal("Relation de Récurrence",
+        `<span class="info-rang">Type ${type + 1}</span>`,
+        `\\(${formulaStr}\\)`,
+        `<p>${questionText}</p><button class="btn btn-generate" onclick="this.innerHTML='Solution : \\\\(${solText}\\\\)'; MathJax.typesetPromise();">Voir solution</button>`
+    );
+}
+
+
+        // --- UTILITAIRES MODAL & UI ---
+        function openModal(title, info, math, interact) {
+            document.getElementById("modalHeader").innerText = title;
+            document.getElementById("modalInfo").innerHTML = info;
+            document.getElementById("modalMath").innerHTML = math;
+            document.getElementById("modalInteraction").innerHTML = interact;
+            modal.style.display = "block";
+            if(window.MathJax) MathJax.typesetPromise();
+        }
+
+        function closeModal() { modal.style.display = "none"; }
+
+        // Drag & Drop du Modal
+        let offset = [0,0], isDown = false;
+        document.getElementById("modalHeader").addEventListener('mousedown', (e) => {
+            isDown = true;
+            offset = [dragElem.offsetLeft - e.clientX, dragElem.offsetTop - e.clientY];
+        }, true);
+        document.addEventListener('mouseup', () => isDown = false, true);
+        document.addEventListener('mousemove', (e) => {
+            if (isDown) {
+                dragElem.style.left = (e.clientX + offset[0]) + 'px';
+                dragElem.style.top  = (e.clientY + offset[1]) + 'px';
+            }
+        }, true);
+
+        // Initialisation
+        window.onload = () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            generateGraph();
+            document.getElementById('copyright-btn').onclick = () => {
+                const c = document.getElementById('copyright-content');
+                c.style.display = c.style.display === 'none' ? 'block' : 'none';
+            };
+        };
+    </script>
+</body>
+</html>
