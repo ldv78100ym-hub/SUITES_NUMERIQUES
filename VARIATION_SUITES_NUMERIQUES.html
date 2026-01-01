@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercice : Sens de variation d'une suite</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+        }
+        h1 { color: #2c3e50; text-align: center; }
+        .enonce {
+            background-color: #e8f4fd;
+            padding: 20px;
+            border-left: 5px solid #3498db;
+            margin: 20px 0;
+            font-size: 1.2rem;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .btn-new { background-color: #3498db; color: white; }
+        .btn-new:hover { background-color: #2980b9; }
+        .btn-check { background-color: #27ae60; color: white; }
+        .btn-check:hover { background-color: #219150; }
+        
+        .correction {
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid #27ae60;
+            display: none;
+            background-color: #f9fffb;
+            border-radius: 8px;
+        }
+        .step { margin-bottom: 10px; }
+        .conclusion { font-weight: bold; color: #2c3e50; border-top: 1px solid #ddd; padding-top: 10px; }
+        
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            background: #fff;
+            max-width: 100%;
+            display: block;
+        }
+
+        /* --- STYLES DU POPUP (MODAL) --- */
+        .footer-controls {
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .btn-credits {
+            background: none;
+            color: #7f8c8d;
+            border: 1px solid #bdc3c7;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            border-radius: 15px;
+        }
+        .btn-credits:hover {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5); 
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover,
+        .close-modal:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0} 
+            to {opacity: 1}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Étude de variation d'une suite</h1>
+    
+    <div class="controls">
+        <button class="btn-new" onclick="genererExercice()">Nouvel exercice</button>
+        <button class="btn-check" onclick="toggleCorrection()">Afficher la solution détaillée</button>
+    </div>
+
+    <div id="enonce" class="enonce"></div>
+
+    <div id="correction" class="correction"></div>
+
+    <canvas id="suiteCanvas" width="600" height="300"></canvas>
+
+    <div class="footer-controls">
+        <button class="btn-credits" onclick="ouvrirCredits()">© Crédits & Droits</button>
+    </div>
+</div>
+
+<div id="creditModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="fermerCredits()">&times;</span>
+        <h2 style="color: var(--primary); margin-top: 0;">⚖️ Droits d'Auteur et Licence</h2>
+            
+            <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 20px;">
+                <strong>Auteur :</strong> Yann Merdy (yann.merdy@gmail.com)<br>
+                <strong>Date :</strong> Janvier 2026
+            </div>
+
+            <h3 style="color: #475569;">Licence d'Utilisation Non Commerciale</h3>
+            <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré sont la propriété intellectuelle exclusive de l'auteur.</p>
+            
+            <ul style="text-align: left; line-height: 1.6;">
+                <li><strong>✅ Utilisation Privée et Éducative :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code à des fins personnelles, éducatives et non lucratives.</li>
+                <li style="margin-top: 10px;"><strong>🚫 Utilisation Commerciale :</strong> Toute utilisation commerciale ou professionnelle est strictement interdite sans accord écrit.</li>
+                <li style="margin-top: 10px;"><strong>✍️ Attribution :</strong> Toute reproduction doit conserver la mention de l'auteur original.</li>
+            </ul>
+    </div>
+</div>
+
+<script>
+    let suiteActuelle = {};
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function fmtSign(val, isFirst = false) {
+        if (val === 0) return isFirst ? "0" : ""; 
+        if (val > 0) {
+            return isFirst ? `${val}` : ` + ${val}`;
+        } else {
+            return isFirst ? `${val}` : ` - ${Math.abs(val)}`;
+        }
+    }
+
+    function genererExercice() {
+        const types = ['poly1', 'poly2', 'rationnelle', 'racine'];
+        const type = types[getRandomInt(0, types.length - 1)];
+        const n0 = getRandomInt(0, 1);
+        let expressionTex = "";
+        let etapes = [];
+        let conclusion = "";
+        
+        let a = getRandomInt(-5, 5); if (a === 0) a = 1;
+        let b = getRandomInt(-10, 10);
+        let c = getRandomInt(1, 5);
+
+        switch(type) {
+            case 'poly1': 
+                expressionTex = `${a === 1 ? '' : a === -1 ? '-' : a}n${fmtSign(b)}`;
+                etapes.push(`1. On exprime \\(u_{n+1}\\) : \\(u_{n+1} = ${a}(n+1)${fmtSign(b)} = ${a}n${fmtSign(a)}${fmtSign(b)}\\).`);
+                etapes.push(`2. On calcule la différence : \\(u_{n+1} - u_n = (${a === 1 ? '' : a === -1 ? '-' : a}n${fmtSign(a+b)}) - (${a === 1 ? '' : a === -1 ? '-' : a}n${fmtSign(b)})\\).`);
+                etapes.push(`3. On simplifie : \\(u_{n+1} - u_n = ${a}\\).`);
+                conclusion = a > 0 ? "La différence est strictement positive, la suite est donc croissante." : (a < 0 ? "La différence est strictement négative, la suite est donc décroissante." : "La différence est nulle, la suite est constante.");
+                break;
+
+            case 'poly2': 
+                const a2 = getRandomInt(1, 2);
+                expressionTex = `${a2 === 1 ? '' : a2}n^2${fmtSign(b)}n${fmtSign(c)}`;
+                etapes.push(`1. On exprime \\(u_{n+1}\\) : \\( ${a2}(n+1)^2${fmtSign(b)}(n+1)${fmtSign(c)} \\).`);
+                etapes.push(`2. On développe : \\( ${a2}(n^2 + 2n + 1)${fmtSign(b)}n${fmtSign(b)}${fmtSign(c)} = ${a2}n^2${fmtSign(2*a2)}n${fmtSign(a2)}${fmtSign(b)}n${fmtSign(b+c)} \\).`);
+                
+                const coeffN = 2*a2;
+                const coeffConst = a2 + b;
+                
+                etapes.push(`3. On calcule \\(u_{n+1} - u_n\\). Après simplification : \\(u_{n+1} - u_n = ${coeffN}n${fmtSign(coeffConst)}\\).`);
+                
+                const valAtN0 = coeffN * n0 + coeffConst;
+                
+                // --- CORRECTION LOGIQUE POUR NON MONOTONE ---
+                if (coeffN > 0 && coeffConst < 0 && valAtN0 < 0) {
+                     const root = -coeffConst / coeffN;
+                     etapes.push(`4. Étude du signe : Le coefficient de \\(n\\) est positif (${coeffN}) mais le terme constant est négatif (${coeffConst}).`);
+                     etapes.push(`La différence s'annule pour \\(n = ${root % 1 === 0 ? root : root.toFixed(1)}\\). Elle change donc de signe.`);
+                     etapes.push(`Pour \\(n < ${root.toFixed(1)}\\), la différence est négative. Pour \\(n > ${root.toFixed(1)}\\), elle est positive.`);
+                     conclusion = "La suite n'est pas monotone (elle change de sens de variation).";
+                } else {
+                     etapes.push(`4. Étude du signe : Pour \\(n \\geq ${n0}\\), la valeur minimale est \\(${coeffN}\\times${n0}${fmtSign(coeffConst)} = ${valAtN0}\\).`);
+                     if (valAtN0 >= 0) {
+                         etapes.push(`La différence \\(u_{n+1} - u_n\\) est toujours positive ou nulle.`);
+                         conclusion = "La différence est positive, la suite est croissante.";
+                     } else {
+                         etapes.push(`La différence est négative.`);
+                         conclusion = "La suite est décroissante.";
+                     }
+                }
+                break;
+
+            case 'rationnelle': 
+                expressionTex = `\\dfrac{${a}n${fmtSign(b)}}{n${fmtSign(c)}}`;
+                const det = a * c - b;
+                etapes.push(`1. On exprime \\(u_{n+1} = \\dfrac{${a}(n+1)${fmtSign(b)}}{(n+1)${fmtSign(c)}} = \\dfrac{${a}n${fmtSign(a+b)}}{n${fmtSign(c+1)}}\\).`);
+                etapes.push(`2. On calcule la différence : \\(u_{n+1} - u_n = \\dfrac{${a}n${fmtSign(a+b)}}{n${fmtSign(c+1)}} - \\dfrac{${a}n${fmtSign(b)}}{n${fmtSign(c)}}\\).`);
+                etapes.push(`3. Après réduction au même dénominateur, on obtient : \\(u_{n+1} - u_n = \\dfrac{${det}}{(n${fmtSign(c+1)})(n${fmtSign(c)})}\\).`);
+                etapes.push(`4. Étude du signe : Le dénominateur est positif pour \\(n \\geq ${n0}\\). Le signe est celui du numérateur : \\(${det}\\).`);
+                conclusion = det > 0 ? "Le numérateur est positif, la suite est donc croissante." : (det < 0 ? "Le numérateur est négatif, la suite est donc décroissante." : "La suite est constante.");
+                break;
+
+            case 'racine': 
+                const coeff = getRandomInt(-10, 10) || 1;
+                const aPos = getRandomInt(1, 5);
+                const bPos = getRandomInt(0, 10);
+                const coeffTex = coeff === 1 ? "" : coeff === -1 ? "-" : coeff;
+                expressionTex = `${coeffTex}\\sqrt{${aPos}n${fmtSign(bPos)}}`;
+                etapes.push(`1. On pose la différence : \\(u_{n+1} - u_n = ${coeffTex}\\sqrt{${aPos}(n+1)${fmtSign(bPos)}} - ${coeffTex}\\sqrt{${aPos}n${fmtSign(bPos)}}\\).`);
+                etapes.push(`2. On factorise : \\(u_{n+1} - u_n = ${coeffTex === "" ? "" : coeff === -1 ? "- (" : coeff + "("}\\sqrt{${aPos}n${fmtSign(aPos+bPos)}} - \\sqrt{${aPos}n${fmtSign(bPos)}}${coeffTex === "" ? "" : ")"}\\).`);
+                etapes.push(`3. La fonction racine carrée est croissante sur \\([0;+\\infty[\\).`);
+                // --- CORRECTION SYNTAXIQUE ICI ---
+                etapes.push(`4. Or pour tout \\(n \\geq ${n0}\\), \\(${aPos}n${fmtSign(aPos+bPos)} \\geq ${aPos}n${fmtSign(bPos)}\\).`);
+                etapes.push(`5. Donc \\(\\sqrt{${aPos}n${fmtSign(aPos+bPos)}} - \\sqrt{${aPos}n${fmtSign(bPos)}} > 0\\).`);
+                const estCroissante = coeff > 0;
+                conclusion = estCroissante ? `Le coefficient ${coeff} est positif, la suite est donc croissante.` : `Le coefficient ${coeff} est négatif, la suite est donc décroissante.`;
+                
+                suiteActuelle.f = (n) => coeff * Math.sqrt(aPos * n + bPos);
+                break;
+        }
+
+        if (type !== 'racine') {
+            suiteActuelle.f = (n) => {
+                if(type === 'poly1') return a*n + b;
+                if(type === 'poly2') return (Math.abs(a)||1)*n*n + b*n + c;
+                if(type === 'rationnelle') return (a*n + b)/(n + c);
+                return 0;
+            };
+        }
+        
+        suiteActuelle.n0 = n0;
+        suiteActuelle.expr = expressionTex;
+
+        document.getElementById('enonce').innerHTML = `Soit la suite \\((u_n)\\) définie pour tout \\(n \\geq ${n0}\\) par : <br> <p style="text-align:center">\\[u_n = ${expressionTex}\\]</p> Étudiez le signe de \\(u_{n+1} - u_n\\) et déduisez-en le sens de variation de la suite.`;
+        
+        let htmlCorr = "<strong>Méthode étape par étape :</strong><br><br>";
+        etapes.forEach(e => {
+            htmlCorr += `<div class="step">${e}</div>`;
+        });
+        htmlCorr += `<div class="conclusion">Conclusion : ${conclusion}</div>`;
+        
+        document.getElementById('correction').innerHTML = htmlCorr;
+        document.getElementById('correction').style.display = 'none';
+
+        MathJax.typesetPromise();
+        dessinerSuite();
+    }
+
+    function dessinerGrille(ctx, width, height, margin) {
+        const step = 10;
+        const majorStep = 50;
+        ctx.beginPath();
+        ctx.strokeStyle = "#f0f0f0";
+        ctx.lineWidth = 0.5;
+        for (let x = 0; x <= width; x += step) {
+            ctx.moveTo(margin + x, margin);
+            ctx.lineTo(margin + x, margin + height);
+        }
+        for (let y = 0; y <= height; y += step) {
+            ctx.moveTo(margin, margin + y);
+            ctx.lineTo(margin + width, margin + y);
+        }
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= width; x += majorStep) {
+            ctx.moveTo(margin + x, margin);
+            ctx.lineTo(margin + x, margin + height);
+        }
+        for (let y = 0; y <= height; y += majorStep) {
+            ctx.moveTo(margin, margin + y);
+            ctx.lineTo(margin + width, margin + y);
+        }
+        ctx.stroke();
+    }
+
+    function dessinerSuite() {
+        const canvas = document.getElementById('suiteCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const margin = 40;
+        const w = canvas.width - 2 * margin;
+        const h = canvas.height - 2 * margin;
+        dessinerGrille(ctx, w, h, margin);
+        let points = [];
+        for (let n = 0; n <= 10; n++) {
+            points.push({n: suiteActuelle.n0 + n, val: suiteActuelle.f(suiteActuelle.n0 + n)});
+        }
+        const vals = points.map(p => p.val);
+        const minVal = Math.min(...vals, 0);
+        const maxVal = Math.max(...vals, 1);
+        const range = maxVal - minVal || 1;
+        
+        ctx.beginPath();
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 2;
+        ctx.moveTo(margin, margin + h);
+        ctx.lineTo(margin + w, margin + h);
+        ctx.moveTo(margin, margin);
+        ctx.lineTo(margin, margin + h);
+        ctx.stroke();
+        
+        ctx.fillStyle = "#e74c3c";
+        points.forEach((p, i) => {
+            const x = margin + (i * (w / 10));
+            const y = (margin + h) - ((p.val - minVal) / range * h);
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fill();
+            if(i % 2 === 0) {
+                ctx.fillStyle = "#555";
+                ctx.font = "10px Arial";
+                ctx.fillText("n=" + p.n, x - 10, margin + h + 15);
+            }
+        });
+    }
+
+    function toggleCorrection() {
+        const div = document.getElementById('correction');
+        const btn = document.querySelector('.btn-check');
+        if (div.style.display === 'none' || div.style.display === '') {
+            div.style.display = 'block';
+            btn.textContent = "Masquer la solution";
+        } else {
+            div.style.display = 'none';
+            btn.textContent = "Afficher la solution détaillée";
+        }
+    }
+
+    function ouvrirCredits() {
+        document.getElementById("creditModal").style.display = "block";
+    }
+
+    function fermerCredits() {
+        document.getElementById("creditModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("creditModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    window.onload = genererExercice;
+</script>
+
+</body>
+</html>
