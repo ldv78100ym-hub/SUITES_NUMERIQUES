@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suites Numériques : Cours & Entraînement Intégré</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --warning-color: #c0392b;
+            --accent-lesson: #3498db; 
+            --accent-dynamic: #8e44ad; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-bottom: 50px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        h1 { color: var(--primary-color); }
+        
+        h2 { 
+            color: var(--accent-lesson);
+            margin-top: 30px;
+            border-left: 5px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .note {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .warning {
+            background-color: #ffe8e8;
+            border-left: 4px solid #e74c3c;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        /* --- Style pour les zones dynamiques intégrées --- */
+        .dynamic-zone {
+            background-color: #fcf4ff; /* Fond très léger violet */
+            border: 1px solid #eaddf0;
+            border-left: 4px solid var(--accent-dynamic);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .dynamic-badge {
+            background-color: var(--accent-dynamic);
+            color: white;
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .refresh-btn-mini {
+            float: right;
+            background: white;
+            border: 1px solid var(--accent-dynamic);
+            color: var(--accent-dynamic);
+            cursor: pointer;
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .refresh-btn-mini:hover {
+            background: var(--accent-dynamic);
+            color: white;
+        }
+
+        .dyn-val {
+            font-weight: bold;
+            color: var(--accent-dynamic);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th { background-color: #f2f2f2; }
+
+        /* --- CANVAS --- */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            background: #fafafa;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            max-width: 100%;
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .controls-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            margin: 5px;
+        }
+        .controls-label {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #777;
+            text-transform: uppercase;
+            margin-right: 5px;
+        }
+
+        /* Boutons Canvas Leçon */
+        button.canvas-btn-lesson {
+            background-color: var(--accent-lesson);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+        button.canvas-btn-lesson:hover { background-color: #2980b9; }
+
+        /* Boutons Canvas Dynamique */
+        button.canvas-btn-dynamic {
+            background-color: var(--accent-dynamic);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+        button.canvas-btn-dynamic:hover { background-color: #6c3483; }
+
+
+        /* --- MODAL COPYRIGHT --- */
+        .copyright-btn {
+            background-color: #7f8c8d;
+            display: block;
+            margin: 40px auto 20px auto;
+            font-size: 0.9rem;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .copyright-btn:hover { background-color: #95a5a6; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-top: 5px solid var(--warning-color);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-modal:hover { color: #000; }
+
+        .legal-title {
+            color: var(--warning-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        .legal-text p { margin-bottom: 15px; text-align: justify; }
+        .legal-text strong { color: #2c3e50; }
+        .legal-highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 3px; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <header>
+        <h1>Généralités sur les Suites Numériques</h1>
+        <p>Cours interactif avec exemples dynamiques intégrés</p>
+    </header>
+
+    <section class="card">
+        <h2>1. Différence entre $u_n$ et $(u_n)$</h2>
+        <p>Il est fondamental de ne pas confondre l'objet mathématique et ses éléments.</p>
+        <table>
+            <tr>
+                <th>Notation</th>
+                <th>Signification</th>
+                <th>Analogie</th>
+            </tr>
+            <tr>
+                <td><strong>$(u_n)$</strong> (avec parenthèses)</td>
+                <td>Désigne la <strong>suite</strong> dans sa globalité (l'objet mathématique entier).</td>
+                <td>C'est la "liste" complète des nombres.</td>
+            </tr>
+            <tr>
+                <td><strong>$u_n$</strong> (sans parenthèses)</td>
+                <td>Désigne le <strong>terme général</strong> ou un terme spécifique d'indice $n$. C'est un nombre réel.</td>
+                <td>C'est un élément précis de la liste.</td>
+            </tr>
+        </table>
+    </section>
+
+    <section class="card">
+        <h2>2. Importance de l'écriture de l'indice</h2>
+        <p>L'indice indique la <strong>position</strong> du terme dans la suite. Une mauvaise graphie change le sens mathématique.</p>
+        <div class="warning">
+            <p><strong>Attention à la position :</strong></p>
+            <ul>
+                <li>$u_n$ : L'indice $n$ est en bas à droite. C'est le $n$-ième terme.</li>
+                <li>$u \times n$ ou $un$ : C'est une multiplication entre une variable $u$ et une variable $n$.</li>
+                <li>$u^n$ : C'est $u$ à la puissance $n$.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>3. Modes de construction</h2>
+        
+        <h3>A. Liste exhaustive de termes indexés</h3>
+        <p class="note"><strong>Définition :</strong> Chaque valeur de la liste est associée à un numéro unique (un entier naturel) qui sert d'étiquette pour la repérer.</p>
+        <p><em>Exemple du cours :</em> $(2; 5; 8; 11; ...)$. Ici $u_0=2$, $u_1=5$, etc.</p>
+
+        <div class="dynamic-zone">
+            <span class="dynamic-badge">Exemple Aléatoire</span>
+            <button class="refresh-btn-mini" onclick="updateSection('list')">↻ Nouvel exemple</button>
+            <p>Soit la suite $(u_n)$ définie par la liste : <span id="dyn-list" class="dyn-val">Chargement...</span></p>
+            <p>Lecture : <span id="dyn-list-detail">...</span></p>
+        </div>
+
+        <h3>B. Formule explicite</h3>
+        <p>Le terme $u_n$ est exprimé directement en fonction de $n$ : $$u_n = f(n)$$</p>
+        <p>Cela permet de calculer n'importe quel terme sans connaître les précédents.</p>
+
+        <div class="dynamic-zone">
+            <span class="dynamic-badge">Exemple Aléatoire</span>
+            <button class="refresh-btn-mini" onclick="updateSection('explicit')">↻ Nouvel exemple</button>
+            <p>Soit la suite définie par : <span id="dyn-explicit-formula" class="dyn-val">$$u_n = ...$$</span></p>
+            <p>Calcul d'un terme au hasard : <span id="dyn-explicit-calc">...</span></p>
+        </div>
+
+        <h3>C. Formule de récurrence</h3>
+        <p>On exprime un terme en fonction du (ou des) précédent(s). Il faut obligatoirement donner le <strong>premier terme</strong>.</p>
+        <p><em>Exemple :</em> $\begin{cases} u_0 = 1 \\ u_{n+1} = 2u_n + 3 \end{cases}$</p>
+
+        <div class="dynamic-zone">
+            <span class="dynamic-badge">Exemple Aléatoire</span>
+            <button class="refresh-btn-mini" onclick="updateSection('recurrence')">↻ Nouvel exemple</button>
+            <p>Système de récurrence : <span id="dyn-recurrence-sys" class="dyn-val">...</span></p>
+            <p>Calcul des premiers termes (pas à pas) : <span id="dyn-recurrence-calc">...</span></p>
+        </div>
+
+        <h3>D. Graphique (Simulation interactive)</h3>
+        <p>Une suite est une fonction définie sur $\mathbb{N}$. Sa représentation graphique est un <strong>nuage de points</strong> isolés.</p>
+        
+        <div class="canvas-container">
+            <canvas id="canvasGraph" width="600" height="300"></canvas>
+            
+            <div class="controls">
+                <div class="controls-group">
+                    <span class="controls-label">Cours (Fixe) :</span>
+                    <button class="canvas-btn-lesson" onclick="drawSuite('explicit')">Suite Explicite</button>
+                    <button class="canvas-btn-lesson" onclick="drawSuite('recurrence')">Suite Récurrente</button>
+                </div>
+                <div class="controls-group">
+                    <span class="controls-label">Entraînement (Aléatoire) :</span>
+                    <button class="canvas-btn-dynamic" onclick="drawRandomExplicit()">Générer Explicite</button>
+                    <button class="canvas-btn-dynamic" onclick="drawRandomRecurrence()">Générer Récurrence</button>
+                    <button class="canvas-btn-dynamic" onclick="drawRandomAlternating()">Générer Alternée</button>
+                </div>
+            </div>
+            <p id="graphDesc" style="font-style: italic; color: #666; min-height: 1.5em; text-align:center; margin-top:10px;"></p>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>4. Différence entre Rang et Indice</h2>
+        <p>C'est une source fréquente d'erreurs, surtout quand la suite ne commence pas à $n=0$.</p>
+        <ul>
+            <li><strong>L'indice ($n$)</strong> : Le "numéro" mathématique écrit en petit ($u_n$).</li>
+            <li><strong>Le rang</strong> : La position "physique" dans la liste (1er, 2ème...).</li>
+        </ul>
+        <div class="note">
+            Formule : Si la suite commence à l'indice $n_0$, le rang du terme d'indice $n$ est : $$r = n - n_0 + 1$$
+        </div>
+        
+        <div class="dynamic-zone">
+            <span class="dynamic-badge">Application Aléatoire</span>
+            <button class="refresh-btn-mini" onclick="updateSection('rank')">↻ Nouvel exemple</button>
+            <div id="dyn-rank-example">Chargement...</div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>5. Déterminer Indices et Rangs</h2>
+        
+        <h3>Trouver l'indice $n$ et le rang connaissant la valeur $u_n$</h3>
+        <p>Il faut résoudre une équation où l'inconnue est $n$ ($n \in \mathbb{N}$), puis déduire le rang par rapport à l'indice de départ $n_0$.</p>
+        
+        <div class="dynamic-zone">
+            <span class="dynamic-badge">Exercice Résolu Aléatoire</span>
+            <button class="refresh-btn-mini" onclick="updateSection('solve')">↻ Nouvel exemple</button>
+            <p id="dyn-solve-n-intro">...</p>
+            <div style="background:white; padding:10px; border-radius:4px; border:1px solid #eee;">
+                <p><strong>Résolution détaillée :</strong></p>
+                <div id="dyn-solve-n-steps">...</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>6. Sens de variation : Étude du signe</h2>
+        <p>Méthode standard : étudier le signe de la différence $\Delta = u_{n+1} - u_n$.</p>
+        <ul>
+            <li>Si résultat $> 0$, suite <strong>croissante</strong>.</li>
+            <li>Si résultat $< 0$, suite <strong>décroissante</strong>.</li>
+        </ul>
+
+        <div class="dynamic-zone">
+            <span class="dynamic-badge">Exemple de Calcul Aléatoire</span>
+            <button class="refresh-btn-mini" onclick="updateSection('variation')">↻ Nouvel exemple</button>
+            <div id="dyn-variation">Chargement...</div>
+        </div>
+    </section>
+
+    <button class="copyright-btn" onclick="toggleModal(true)">© Mentions Légales & Droits d'Auteur</button>
+
+</div>
+
+<div id="copyrightModal" class="modal-overlay" onclick="toggleModal(false)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="toggleModal(false)">&times;</span>
+        
+        <h3 class="legal-title">🚨 Avertissement - Droits d'Auteur</h3>
+        <div class="legal-text">
+            <p><strong>(Livre I, Titre II du Code de la propriété intellectuelle)</strong></p>
+            
+            <p>Le contenu de ce document, y compris le code JavaScript et les fonctions de génération d'exercices, est protégé par le droit d'auteur. Toute reproduction ou utilisation sans l'accord écrit de l'auteur est strictement interdite.</p>
+            
+            <p><strong>Article L.111-1 :</strong> L'auteur d'une oeuvre de l'esprit jouit sur cette oeuvre, du seul fait de sa création, d'un droit de propriété incorporelle exclusif et opposable à tous.</p>
+            
+            <p><strong>Article L.122-4 :</strong> Toute représentation ou reproduction intégrale ou partielle faite sans le consentement de l'auteur ou de ses ayants droit ou ayants cause est illicite.</p>
+            
+            <p><span class="legal-highlight"><strong>Article L.335-2 (Sanctions) :</strong> La contrefaçon en France est un délit puni de trois ans d'emprisonnement et de 300 000 euros d'amende.</span></p>
+            
+            <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+                Pour toute demande d'autorisation de reproduction ou de diffusion, veuillez contacter l'auteur : <br>
+                <a href="mailto:yann.merdy@gmail.com" style="color: #3498db; text-decoration: none;">yann.merdy@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // --- FONCTIONS UTILITAIRES DE FORMATAGE ---
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Gestion propre des signes et constantes
+    function fmt(n, addSign = false) { 
+        if (n === 0) return "";
+        if (n > 0) return addSign ? `+ ${n}` : `${n}`;
+        return `- ${Math.abs(n)}`;
+    }
+    
+    // Gestion propre des coefficients (ex: 1n -> n, -1n -> -n)
+    function fmtCoeff(n, variable) {
+        if (n === 0) return "";
+        let sign = n > 0 ? "+" : "-";
+        let abs = Math.abs(n);
+        let valStr = abs === 1 ? "" : abs;
+        return ` ${sign} ${valStr}${variable}`;
+    }
+
+    // Helper pour le tout premier terme d'une expression (retire le "+" initial si présent)
+    function fmtStart(n, variable) {
+        let s = fmtCoeff(n, variable).trim();
+        // Si la chaîne commence par "+" (ex: "+ 2n"), on le retire.
+        // Si elle commence par "-" (ex: "- 2n"), on le garde.
+        if (s.startsWith('+')) {
+            return s.substring(1).trim();
+        }
+        return s;
+    }
+
+    function refreshMathJax() {
+        if(window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+    }
+
+    // --- FONCTIONS DE GÉNÉRATION DE CONTENU ---
+
+    function genList() {
+        const startA = randInt(-5, 10);
+        const stepA = randInt(2, 6) * (Math.random() > 0.5 ? 1 : -1);
+        let listStr = `( ${startA} ; ${startA + stepA} ; ${startA + 2*stepA} ; ${startA + 3*stepA} ; ... )`;
+        document.getElementById('dyn-list').innerHTML = `$${listStr}$`;
+        document.getElementById('dyn-list-detail').innerHTML = `On observe que $u_0=${startA}$, $u_1=${startA + stepA}$, etc.`;
+    }
+
+    function genExplicit() {
+        const type = randInt(1, 4);
+        const nVal = randInt(2, 10);
+        let formulaTex = "";
+        let calcTex = "";
+        let res = 0;
+
+        if (type === 1) { // --- Affine ---
+            const a = randInt(2, 9) * (Math.random() > 0.5 ? 1 : -1);
+            const b = randInt(-10, 10);
+            
+            // Ex: u_n = 2n + 3 ou u_n = -2n - 5
+            formulaTex = `u_n = ${fmtStart(a, "n")} ${fmt(b, true)}`;
+            res = a * nVal + b;
+            calcTex = `u_{${nVal}} = ${a} \\times ${nVal} ${fmt(b, true)} = ${res}`;
+
+        } else if (type === 2) { // --- Quadratique ---
+            const a = randInt(1, 3);
+            const b = randInt(-5, 5);
+            const c = randInt(-10, 10);
+            
+            // Ex: u_n = 2n^2 - 3n + 1
+            formulaTex = `u_n = ${fmtStart(a, "n^2")} ${fmtCoeff(b, "n")} ${fmt(c, true)}`;
+            res = a * nVal * nVal + b * nVal + c;
+            calcTex = `u_{${nVal}} = ${a} \\times ${nVal}^2 ${fmt(b, true)}\\times${nVal} ${fmt(c, true)} = ${res}`;
+
+        } else if (type === 3) { // --- Rationnelle ---
+            const a = randInt(1, 5);
+            const b = randInt(1, 10);
+            const c = randInt(1, 3);
+            const d = randInt(1, 5);
+            
+            formulaTex = `u_n = \\frac{${fmtStart(a, "n")} ${fmt(b, true)}}{${fmtStart(c, "n")} ${fmt(d, true)}}`;
+            const num = a * nVal + b;
+            const den = c * nVal + d;
+            res = num / den;
+            
+            let approx = num % den !== 0 ? `\\approx ${res.toFixed(2)}` : "";
+            calcTex = `u_{${nVal}} = \\frac{${a}\\times${nVal} ${fmt(b, true)}}{${c}\\times${nVal} ${fmt(d, true)}} = \\frac{${num}}{${den}} ${approx}`;
+            if (num % den === 0) calcTex += ` = ${res}`;
+
+        } else { // --- Racine ---
+            const a = randInt(1, 6);
+            const b = randInt(0, 10);
+            
+            formulaTex = `u_n = \\sqrt{${fmtStart(a, "n")} ${fmt(b, true)}}`;
+            const inner = a * nVal + b;
+            res = Math.sqrt(inner);
+            let valStr = Number.isInteger(res) ? `= ${res}` : `\\approx ${res.toFixed(2)}`;
+            calcTex = `u_{${nVal}} = \\sqrt{${a}\\times${nVal} ${fmt(b, true)}} = \\sqrt{${inner}} ${valStr}`;
+        }
+        document.getElementById('dyn-explicit-formula').innerHTML = `$$${formulaTex}$$`;
+        document.getElementById('dyn-explicit-calc').innerHTML = `Pour $n=${nVal}$ : $${calcTex}$.`;
+    }
+
+    function genRecurrence() {
+        const type = randInt(1, 4);
+        let u0 = randInt(1, 5); 
+        let sysTex = "";
+        let step1Tex = "";
+        let step2Tex = "";
+        let u1, u2;
+
+        if (type === 1) { // --- Affine ---
+            const a = randInt(2, 4);
+            const b = randInt(-5, 5);
+            sysTex = `\\begin{cases} u_0 = ${u0} \\\\ u_{n+1} = ${fmtStart(a, "u_n")} ${fmt(b, true)} \\end{cases}`;
+            u1 = a * u0 + b; u2 = a * u1 + b;
+            step1Tex = `${a} \\times ${u0} ${fmt(b, true)} = ${u1}`;
+            step2Tex = `${a} \\times ${u1} ${fmt(b, true)} = ${u2}`;
+
+        } else if (type === 2) { // --- Quadratique ---
+            u0 = randInt(0, 2);
+            const b = randInt(-2, 3);
+            sysTex = `\\begin{cases} u_0 = ${u0} \\\\ u_{n+1} = u_n^2 ${fmt(b, true)} \\end{cases}`;
+            u1 = u0 * u0 + b; u2 = u1 * u1 + b;
+            step1Tex = `${u0}^2 ${fmt(b, true)} = ${u1}`;
+            step2Tex = `(${u1})^2 ${fmt(b, true)} = ${u2}`;
+
+        } else if (type === 3) { // --- Rationnelle ---
+            const a = randInt(1, 5);
+            const b = randInt(1, 5);
+            const c = randInt(1, 5);
+            sysTex = `\\begin{cases} u_0 = ${u0} \\\\ u_{n+1} = \\frac{${fmtStart(a, "u_n")} ${fmt(b, true)}}{u_n ${fmt(c, true)}} \\end{cases}`;
+            u1 = (a * u0 + b) / (u0 + c); u2 = (a * u1 + b) / (u1 + c);
+            let u1S = Number.isInteger(u1) ? u1 : u1.toFixed(2);
+            let u2S = Number.isInteger(u2) ? u2 : u2.toFixed(2);
+            step1Tex = `\\frac{${a}\\times${u0} ${fmt(b, true)}}{${u0} ${fmt(c, true)}} \\approx ${u1S}`;
+            step2Tex = `\\dots \\approx ${u2S}`;
+
+        } else { // --- Racine ---
+            const a = randInt(1, 4);
+            const b = randInt(0, 5);
+            sysTex = `\\begin{cases} u_0 = ${u0} \\\\ u_{n+1} = \\sqrt{${fmtStart(a, "u_n")} ${fmt(b, true)}} \\end{cases}`;
+            u1 = Math.sqrt(a * u0 + b); u2 = Math.sqrt(a * u1 + b);
+            step1Tex = `\\sqrt{${a}\\times${u0} ${fmt(b, true)}} \\approx ${Number.isInteger(u1) ? u1 : u1.toFixed(2)}`;
+            step2Tex = `\\dots \\approx ${Number.isInteger(u2) ? u2 : u2.toFixed(2)}`;
+        }
+        document.getElementById('dyn-recurrence-sys').innerHTML = `$${sysTex}$`;
+        document.getElementById('dyn-recurrence-calc').innerHTML = `$u_0 = ${u0}$ <br> $u_1 = ${step1Tex}$ <br> $u_2 = ${step2Tex}$`;
+    }
+
+    function genRank() {
+        const startIdx = randInt(0, 3);
+        const targetIdx = startIdx + randInt(4, 15);
+        const rank = targetIdx - startIdx + 1;
+        document.getElementById('dyn-rank-example').innerHTML = `Si une suite commence à l'indice $n_0 = ${startIdx}$ ($u_{${startIdx}}$) :<br>
+        Le terme d'indice $n=${targetIdx}$ ($u_{${targetIdx}}$) correspond au rang :<br>
+        $$rang = n - n_0 + 1 = ${targetIdx} - ${startIdx} + 1 = \\mathbf{${rank}^{\\text{ème}} \\text{ terme}}$$`;
+    }
+
+    // --- DOMAINE DE DEFINITION POUR LA RACINE ---
+    function genSolve() {
+        const type = randInt(1, 4);
+        let startN = randInt(0, 2); 
+        let solN = randInt(5, 15);
+        
+        let formulaTex = "";
+        let steps = "";
+        let targetVal = 0;
+        let introHtml = `Soit la suite $(u_n)$ définie par : `;
+
+        if (type === 1) { // Affine
+            const a = randInt(2, 6);
+            const b = randInt(-10, 10);
+            targetVal = a * solN + b;
+            formulaTex = `u_n = ${fmtStart(a, "n")} ${fmt(b, true)}`;
+            introHtml += `$${formulaTex}$ (pour $n \\ge ${startN}$).<br>On cherche l'<strong>indice $n$</strong> tel que $u_n = ${targetVal}$, puis le <strong>rang</strong>.`;
+            
+            steps += `<strong>1. Recherche de l'indice $n$ :</strong><br>`;
+            steps += `On résout $${fmtStart(a, "n")} ${fmt(b, true)} = ${targetVal}$<br>`;
+            steps += `$$${a}n = ${targetVal} ${fmt(-b, true)}$$`; // On inverse le signe de b pour l'équation
+            steps += `$$n = \\frac{${targetVal - b}}{${a}} = \\mathbf{${solN}}$$`;
+
+        } else if (type === 2) { // Quadratique
+            const c = randInt(-10, 10);
+            targetVal = solN * solN + c;
+            formulaTex = `u_n = n^2 ${fmt(c, true)}`;
+            introHtml += `$${formulaTex}$ (pour $n \\ge ${startN}$).<br>On cherche l'<strong>indice $n$</strong> tel que $u_n = ${targetVal}$, puis le <strong>rang</strong>.`;
+
+            steps += `<strong>1. Recherche de l'indice $n$ ($n \\in \\mathbb{N}$) :</strong><br>`;
+            steps += `On résout $n^2 ${fmt(c, true)} = ${targetVal}$<br>`;
+            steps += `$$n^2 = ${targetVal} ${fmt(-c, true)}$$`;
+            steps += `Comme $n$ positif, $n = \\sqrt{${targetVal - c}} = \\mathbf{${solN}}$$`;
+
+        } else if (type === 3) { // Rationnelle
+            const K = randInt(1, 5); 
+            const D = randInt(1, 5);
+            const denVal = solN + D;
+            const realNum = denVal * randInt(2, 6); 
+            targetVal = K + realNum / denVal;
+
+            formulaTex = `u_n = ${K} + \\frac{${realNum}}{n ${fmt(D, true)}}`;
+            introHtml += `$${formulaTex}$.<br>On cherche l'<strong>indice $n$</strong> tel que $u_n = ${targetVal}$, puis le <strong>rang</strong> en prenant $n_0=${startN}$.`;
+
+            steps += `<strong>1. Recherche de l'indice $n$ :</strong><br>`;
+            steps += `On résout $${K} + \\frac{${realNum}}{n ${fmt(D, true)}} = ${targetVal}$<br>`;
+            steps += `$$\\frac{${realNum}}{n ${fmt(D, true)}} = ${targetVal} - ${K} = ${targetVal - K}$$`;
+            steps += `$$n ${fmt(D, true)} = \\frac{${realNum}}{${targetVal - K}} = ${realNum / (targetVal - K)}$$`;
+            steps += `$$n = ${solN}$$`;
+
+        } else { // --- TYPE 4 : RACINE (DOMAINE COMPLEXE) ---
+            const isNegativeCoef = Math.random() < 0.3; 
+            let a, b, domainMsg;
+            const perfectSquare = randInt(2, 10);
+            targetVal = perfectSquare;
+            
+            if (isNegativeCoef) {
+                a = -1 * randInt(1, 4);
+                b = perfectSquare * perfectSquare - a * solN;
+                const maxN = Math.floor(-b/a);
+                domainMsg = `Il faut $${fmtStart(a, "n")} ${fmt(b, true)} \\ge 0 \\iff ${a}n \\ge ${-b} \\iff n \\le \\frac{${-b}}{${a}}$ (car on divise par un négatif).<br>Soit $n \\le ${(-b/a).toFixed(1)}$.`;
+                startN = 0; 
+            } else {
+                a = randInt(2, 5);
+                b = perfectSquare * perfectSquare - a * solN; 
+                const minN = Math.ceil(-b/a);
+                domainMsg = `Il faut $${fmtStart(a, "n")} ${fmt(b, true)} \\ge 0 \\iff ${a}n \\ge ${-b} \\iff n \\ge \\frac{${-b}}{${a}}$.<br>Soit $n \\ge ${(-b/a).toFixed(1)}$. La suite est définie à partir de $n_{min} = ${Math.max(0, minN)}$.`;
+                if(startN < minN) startN = Math.max(0, minN);
+            }
+
+            formulaTex = `u_n = \\sqrt{${fmtStart(a, "n")} ${fmt(b, true)}}`;
+            introHtml += `$${formulaTex}$.<br>Déterminez le <strong>domaine de définition</strong>, puis l'<strong>indice $n$</strong> tel que $u_n = ${targetVal}$.`;
+
+            steps += `<strong>1. Domaine de définition (Condition d'existence) :</strong><br>`;
+            steps += `L'expression sous la racine doit être positive ou nulle.<br>`;
+            steps += `${domainMsg}<br><br>`;
+            
+            steps += `<strong>2. Recherche de l'indice $n$ :</strong><br>`;
+            steps += `On résout $\\sqrt{${fmtStart(a, "n")} ${fmt(b, true)}} = ${targetVal}$<br>`;
+            steps += `On élève au carré : $${fmtStart(a, "n")} ${fmt(b, true)} = ${targetVal}^2 = ${targetVal*targetVal}$<br>`;
+            steps += `$$${a}n = ${targetVal*targetVal} ${fmt(-b, true)}$$`;
+            steps += `$$n = \\frac{${targetVal*targetVal - b}}{${a}} = \\mathbf{${solN}}$$`;
+            
+            steps += `<br><strong>3. Vérification :</strong><br>`;
+            steps += `L'indice trouvé $n=${solN}$ est bien dans le domaine de définition.`;
+        }
+
+        const rank = solN - startN + 1;
+        steps += `<br><br><strong>4. Calcul du Rang (pour un départ $n_0=${startN}$) :</strong><br>`;
+        steps += `$$Rang = n - n_0 + 1 = ${solN} - ${startN} + 1 = \\mathbf{${rank}^{\\text{ème}} \\text{ terme}}$$`;
+
+        document.getElementById('dyn-solve-n-intro').innerHTML = introHtml;
+        document.getElementById('dyn-solve-n-steps').innerHTML = steps;
+    }
+
+    // --- VARIATION (AFFINE, QUADRATIQUE, RATIONNELLE) ---
+    function genVariation() {
+        const type = randInt(1, 3);
+        let introHtml = "";
+        let steps = "";
+        
+        if (type === 1) { // Affine
+            const a = randInt(1, 8) * (Math.random() > 0.5 ? 1 : -1);
+            const b = randInt(-10, 10);
+            const sign = a > 0 ? ">" : "<";
+            const varStr = a > 0 ? "croissante" : "décroissante";
+            
+            introHtml = `Soit la suite affine $u_n = ${fmtStart(a, "n")} ${fmt(b, true)}$. Étudions son sens de variation.`;
+            steps += `Calculons la différence $u_{n+1} - u_n$ :<br>`;
+            steps += `$$u_{n+1} = ${a}(n+1) ${fmt(b, true)} = ${a}n ${fmt(a, true)} ${fmt(b, true)}$$`;
+            steps += `$$u_{n+1} - u_n = (${a}n ${fmt(a+b, true)}) - (${fmtStart(a, "n")} ${fmt(b, true)}) = ${a}$$`;
+            steps += `Comme ${a} est constant et ${sign} 0, la suite est strictement <strong>${varStr}</strong>.`;
+
+        } else if (type === 2) { // Quadratique u_n = an^2 + bn + c
+            const a = randInt(1, 3) * (Math.random() > 0.5 ? 1 : -1);
+            let b;
+            if (a > 0) b = randInt(-a + 1, 10); // Assure a+b > 0
+            else b = randInt(-10, -a - 1);      // Assure a+b < 0
+            const c = randInt(-5, 5);
+            
+            introHtml = `Soit la suite quadratique $u_n = ${fmtStart(a, "n^2")} ${fmtCoeff(b, "n")} ${fmt(c, true)}$. Étudions son sens de variation.`;
+            steps += `Calculons la différence :<br>`;
+            steps += `$$u_{n+1} - u_n = [${a}(n+1)^2 ${fmt(b, true)}(n+1) ${fmt(c, true)}] - [${fmtStart(a, "n^2")} ${fmtCoeff(b, "n")} ${fmt(c, true)}]$$`;
+            steps += `On développe $(n+1)^2 = n^2+2n+1$. Les termes en $n^2$ s'annulent.<br>`;
+            steps += `$$u_{n+1} - u_n = ${a}(2n+1) ${fmt(b, true)} = ${2*a}n ${fmt(a, true)} ${fmt(b, true)} = ${fmtStart(2*a, "n")} ${fmt(a+b, true)}$$`;
+            
+            if (a > 0) {
+                steps += `Comme $n \\ge 0$, ${2*a}n \\ge 0$. De plus ${a+b} > 0.<br>`;
+                steps += `Donc $u_{n+1} - u_n > 0$. La suite est <strong>croissante</strong>.`;
+            } else {
+                steps += `Comme $n \\ge 0$, ${2*a}n \\le 0$. De plus ${a+b} < 0.<br>`;
+                steps += `Donc $u_{n+1} - u_n < 0$. La suite est <strong>décroissante</strong>.`;
+            }
+
+        } else { // Rational (Homographic) u_n = (an+b)/(n+d)
+            const d = randInt(1, 5); 
+            const a = randInt(1, 5) * (Math.random() > 0.5 ? 1 : -1);
+            let b = randInt(-5, 5);
+            while (a*d - b === 0) { b = randInt(-5, 5); } // det != 0
+            
+            const det = a*d - b;
+            const sign = det > 0 ? ">" : "<";
+            const varStr = det > 0 ? "croissante" : "décroissante";
+
+            introHtml = `Soit la suite rationnelle $u_n = \\frac{${fmtStart(a, "n")} ${fmt(b, true)}}{n ${fmt(d, true)}}$ (définie pour $n \\ge 0$).`;
+            steps += `Calculons $u_{n+1} - u_n$ (réduction au même dénominateur) :<br>`;
+            steps += `$$u_{n+1} - u_n = \\frac{${a}(n+1) ${fmt(b, true)}}{(n+1) ${fmt(d, true)}} - \\frac{${fmtStart(a, "n")} ${fmt(b, true)}}{n ${fmt(d, true)}}$$`;
+            steps += `Le dénominateur commun $D = (n ${fmt(d+1, true)})(n ${fmt(d, true)})$ est strictement positif.<br>`;
+            steps += `Le signe dépend du numérateur (déterminant) : $a \\times d - b \\times c$.<br>`;
+            steps += `$$Num = (${a} \\times ${d}) - (${b} \\times 1) = ${a*d} ${fmt(-b, true)} = ${det}$$`;
+            steps += `Comme le numérateur est ${sign} 0 et le dénominateur positif, la suite est <strong>${varStr}</strong>.`;
+        }
+
+        document.getElementById('dyn-variation').innerHTML = introHtml + '<div style="margin-top:10px; background:white; padding:10px; border-radius:4px; border:1px solid #eee;">' + steps + '</div>';
+        refreshMathJax();
+    }
+
+    // Gestion centralisée des mises à jour
+    function updateSection(section) {
+        switch(section) {
+            case 'list': genList(); break;
+            case 'explicit': genExplicit(); break;
+            case 'recurrence': genRecurrence(); break;
+            case 'rank': genRank(); break;
+            case 'solve': genSolve(); break;
+            case 'variation': genVariation(); break;
+            case 'all':
+                genList(); genExplicit(); genRecurrence(); 
+                genRank(); genSolve(); genVariation();
+                break;
+        }
+        refreshMathJax();
+    }
+
+
+    // --- GESTION DU CANVAS (GRAPHIQUE) ---
+    
+    function drawAxes(ctx, width, height, margin) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        const centerY = height / 2;
+        ctx.moveTo(margin, centerY);
+        ctx.lineTo(width - margin, centerY);
+        ctx.moveTo(margin, height - margin);
+        ctx.lineTo(margin, margin);
+        ctx.stroke();
+        ctx.fillStyle = '#333';
+        ctx.font = '14px Arial';
+        ctx.fillText('n', width - margin + 5, centerY);
+        ctx.fillText('u_n', margin - 10, margin - 10);
+    }
+
+    function drawPoint(ctx, n, un, maxN, maxAbsUn, width, height, margin, color) {
+        const usableWidth = width - 2 * margin;
+        const usableHalfHeight = (height / 2) - margin;
+        const centerY = height / 2;
+        if(maxAbsUn === 0) maxAbsUn = 1;
+        const x = margin + (n / maxN) * usableWidth;
+        const y = centerY - (un / maxAbsUn) * usableHalfHeight;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+        if(y >= margin && y <= height-margin) {
+            ctx.beginPath();
+            ctx.setLineDash([2, 4]);
+            ctx.strokeStyle = '#bbb';
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, centerY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    }
+
+    function renderGraph(terms, desc, isRandom) {
+        const canvas = document.getElementById('canvasGraph');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const margin = 30;
+        ctx.clearRect(0, 0, width, height);
+        drawAxes(ctx, width, height, margin);
+        const maxN = 15;
+        const maxAbsUn = Math.max(...terms.map(t => Math.abs(t.val))) * 1.1;
+        const color = isRandom ? '#8e44ad' : '#3498db';
+        terms.forEach(t => drawPoint(ctx, t.n, t.val, maxN, maxAbsUn, width, height, margin, color));
+        document.getElementById('graphDesc').innerHTML = desc;
+        refreshMathJax();
+    }
+
+    function drawSuite(type) {
+        let terms = [];
+        let desc = "";
+        const maxN = 15;
+        if (type === 'explicit') {
+            desc = "<strong>Exemple Cours :</strong> $u_n = 0.5n + 1$ (Suite Arithmétique)";
+            for(let n=0; n<=maxN; n++) terms.push({n: n, val: 0.5 * n + 1});
+        } else if (type === 'recurrence') {
+            desc = "<strong>Exemple Cours :</strong> $u_0 = 1, u_{n+1} = 0.8u_n + 1$ (Convergence)";
+            let u = 1; terms.push({n: 0, val: u});
+            for(let n=1; n<=maxN; n++) { u = 0.8 * u + 1; terms.push({n: n, val: u}); }
+        }
+        renderGraph(terms, desc, false);
+    }
+
+    function drawRandomExplicit() {
+        const maxN = 15;
+        let terms = [];
+        const a = (Math.random() * 1.5 + 0.2).toFixed(1);
+        const b = Math.floor(Math.random() * 5);
+        // Utilisation de fmtStart et fmt pour le graphique
+        let desc = `<strong>Aléatoire :</strong> $u_n = ${fmtStart(a, "n")} ${fmt(b, true)}$`;
+        for(let n=0; n<=maxN; n++) terms.push({n: n, val: parseFloat(a) * n + b});
+        renderGraph(terms, desc, true);
+    }
+
+    function drawRandomRecurrence() {
+        const maxN = 15;
+        let terms = [];
+        const a = (Math.random() * 0.6 + 0.2).toFixed(2);
+        const b = Math.floor(Math.random() * 5 + 1);
+        let u = Math.floor(Math.random() * 10);
+        let desc = `<strong>Aléatoire :</strong> $u_0=${u}, u_{n+1} = ${fmtStart(a, "u_n")} ${fmt(b, true)}$`;
+        terms.push({n: 0, val: u});
+        for(let n=1; n<=maxN; n++) { u = parseFloat(a) * u + b; terms.push({n: n, val: u}); }
+        renderGraph(terms, desc, true);
+    }
+
+    // --- MODIFICATION ICI : NOUVELLES SUITES ALTERNÉES ---
+    function drawRandomAlternating() {
+        const maxN = 15;
+        let terms = [];
+        const type = randInt(1, 3);
+        let desc = "";
+
+        if (type === 1) { // Forme Amortie (Standard)
+            const K = randInt(5, 15);
+            desc = `<strong>Aléatoire :</strong> $u_n = (-1)^n \\times \\frac{${K}}{n+1}$ (Amortie)`;
+            for(let n=0; n<=maxN; n++) terms.push({n: n, val: Math.pow(-1, n) * (K / (n+1))});
+        }
+        else if (type === 2) { // Forme Géométrique
+            const u0 = randInt(2, 8) * (Math.random() > 0.5 ? 1 : -1);
+            const q = -(Math.random() * 0.4 + 0.5).toFixed(1); // entre -0.5 et -0.9
+            const shift = randInt(-3, 3);
+            desc = `<strong>Aléatoire :</strong> $u_n = ${u0} \\times (${q})^n ${fmt(shift, true)}$ (Géométrique)`;
+            for(let n=0; n<=maxN; n++) terms.push({n: n, val: u0 * Math.pow(parseFloat(q), n) + shift});
+        }
+        else { // Forme Divergente (Explosive)
+            const a = (Math.random() * 0.5 + 0.2).toFixed(1);
+            const b = randInt(1, 4);
+            desc = `<strong>Aléatoire :</strong> $u_n = (-1)^n (${a}n ${fmt(b, true)})$ (Divergente)`;
+            for(let n=0; n<=maxN; n++) terms.push({n: n, val: Math.pow(-1, n) * (parseFloat(a) * n + b)});
+        }
+        
+        renderGraph(terms, desc, true);
+    }
+
+    function toggleModal(show) {
+        document.getElementById('copyrightModal').style.display = show ? 'flex' : 'none';
+    }
+
+    window.onload = function() {
+        updateSection('all');
+        drawSuite('explicit');
+    };
+</script>
+
+</body>
+</html>
