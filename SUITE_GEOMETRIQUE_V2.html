@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suites Géométriques : Design Pro</title>
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            startup: { typeset: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            --primary: #8b5cf6; /* Changement de couleur vers le Violet pour différencier */
+            --pos: #10B981; 
+            --neg: #F59E0B; /* Orange pour la décroissance géométrique (car positif mais décroissant) */
+            --bg: #f8fafc;
+            --text: #334155;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .controls-header {
+            background: linear-gradient(135deg, #4c1d95, #2e1065);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        h1 { margin: 0 0 10px 0; font-weight: 800; letter-spacing: -0.025em; }
+        
+        .big-btn {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        .big-btn:hover { background-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+        .param-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 16px;
+            border-radius: 12px;
+            margin: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+        }
+        
+        h2 { 
+            color: var(--primary); 
+            font-size: 1.25rem; 
+            margin-top: 0; 
+            border-bottom: 1px solid #f1f5f9; 
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 350px;
+            background: #ffffff;
+            border-radius: 8px;
+            margin: 15px 0;
+            cursor: crosshair;
+        }
+
+        .center-actions { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+        
+        button.action {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+        }
+        button.action:hover { background-color: #7c3aed; }
+        button.reset { background-color: white; color: #64748b; border: 1px solid #cbd5e1; box-shadow: none; }
+        button.reset:hover { background-color: #f8fafc; color: #334155; }
+
+        .explanation {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            font-size: 0.95rem;
+            color: #475569;
+        }
+        
+        .variation-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            align-items: center;
+        }
+        @media (max-width: 600px) {
+            .variation-grid { grid-template-columns: 1fr; }
+        }
+
+        /* --- STYLES MODALE DROITS D'AUTEUR --- */
+        .copyright-footer { text-align: center; margin-top: 40px; margin-bottom: 20px; }
+        .copyright-btn {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .copyright-btn:hover { background: white; color: #334155; border-color: #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 9999; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10vh auto;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: #94a3b8;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close-btn:hover { color: #334155; }
+        
+        .license-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .license-list li { margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="controls-header">
+        <h1>Suites Géométriques</h1>
+        <p style="opacity: 0.8; font-size: 0.9rem;">Simulation dynamique (Termes > 0)</p>
+        
+        <div style="margin-top: 15px;">
+            <span class="param-badge"><span id="lbl-start-idx" style="color:#94a3b8; margin-right:8px;">\(u_0\)</span> <span id="disp-val" style="color: white;">?</span></span>
+            <span class="param-badge"><span style="color:#94a3b8; margin-right:8px;">\(q\)</span> <span id="disp-q" style="color: white;">?</span></span>
+        </div>
+
+        <button class="big-btn" onclick="generateNewScenario()">
+            ⚡ Générer une nouvelle suite
+        </button>
+    </div>
+
+    <div class="card">
+        <h2>1. Évolution Pas à Pas</h2>
+        <p style="font-size: 0.9rem; color: #64748b;">Visualisation de la multiplication par la raison.</p>
+        
+        <canvas id="cvsDiscovery"></canvas>
+        
+        <div class="center-actions">
+            <button class="action" onclick="stepForward()">Multiplier par q</button>
+            <button class="action reset" onclick="resetStep()">Réinitialiser</button>
+        </div>
+        
+        <div id="narrative-1" class="explanation" style="margin-top: 20px;">Initialisation...</div>
+    </div>
+
+    <div class="card">
+        <h2>2. Définition Formelle</h2>
+        <div id="math-def-area" style="font-size: 1.1em; padding: 10px;"></div>
+    </div>
+
+    <div class="card">
+        <h2>3. Sens de Variation</h2>
+        <div id="variation-area" style="font-size: 1.05rem;"></div>
+    </div>
+
+    <div class="card">
+        <h2 id="header-global">4. Projection Globale</h2>
+        <p style="font-size: 0.9rem; color: #64748b;">Analyse de l'allure exponentielle.</p>
+        <canvas id="cvsGlobal"></canvas>
+        <div id="math-calc-area" class="explanation" style="text-align: center; margin-top: 20px;"></div>
+    </div>
+
+    <div class="copyright-footer">
+        <button class="copyright-btn" onclick="openModal()">⚖️ Droits d'Auteur</button>
+    </div>
+
+</div>
+
+<div id="copyrightModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        
+        <h2 style="color: var(--text); border:none; margin-top:0;">⚖️ Droits d'Auteur et Licence</h2>
+        
+        <div style="color: #475569; font-size: 0.95rem;">
+            <p>
+                <strong>Auteur :</strong> Yann Merdy (<a href="mailto:yann.merdy@gmail.com" style="color:var(--primary); text-decoration:none;">yann.merdy@gmail.com</a>)<br>
+                <strong>Date :</strong> Janvier 2026
+            </p>
+            
+            <div class="license-box">
+                <h3 style="margin:0 0 10px 0; font-size:1rem; color:#1e293b;">Licence d'Utilisation Non Commerciale</h3>
+                <p style="margin:0;">Ce code HTML/CSS/JavaScript ainsi que le contenu généré sont la propriété intellectuelle exclusive de l'auteur.</p>
+            </div>
+
+            <ul class="license-list" style="list-style:none; padding:0;">
+                <li>✅ <strong>Utilisation Privée et Éducative :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code à des fins personnelles, éducatives et non lucratives.</li>
+                <li>🚫 <strong>Utilisation Commerciale :</strong> Toute utilisation commerciale ou professionnelle est strictement interdite sans accord écrit.</li>
+                <li>✍️ <strong>Attribution :</strong> Toute reproduction doit conserver la mention de l'auteur original.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* --- GESTION MODALE --- */
+    function openModal() {
+        document.getElementById('copyrightModal').style.display = 'block';
+    }
+    function closeModal() {
+        document.getElementById('copyrightModal').style.display = 'none';
+    }
+    // Fermer si on clique en dehors
+    window.onclick = function(event) {
+        const modal = document.getElementById('copyrightModal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    /* --- CONFIGURATION SUITE --- */
+    // q remplace r pour la raison
+    let GAME = { startVal: 1, q: 1, step: 0, startIdx: 0 };
+    
+    const THEME = { 
+        pos: '#10B981', 
+        posLight: 'rgba(16, 185, 129, 0.1)',
+        neg: '#F59E0B', // Utilisation de orange pour la décroissance positive (0 < q < 1)
+        negLight: 'rgba(245, 158, 11, 0.1)',
+        grid: '#e2e8f0', 
+        axis: '#64748b',
+        text: '#475569' 
+    };
+
+    window.onload = function() { generateNewScenario(); };
+
+    /* --- UTILITAIRES --- */
+    function toSubscript(num) {
+        const str = num.toString();
+        const map = { '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉' };
+        return str.split('').map(c => map[c] || c).join('');
+    }
+    
+    // Fonction pour arrondir proprement les affichages
+    function fmt(num) {
+        return parseFloat(num.toPrecision(4)); 
+    }
+    
+    function setupCanvas(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, width: rect.width, height: rect.height };
+    }
+
+    function drawGrid(ctx, w, h, stepX, yZero, numLines = 5) {
+        ctx.beginPath();
+        ctx.strokeStyle = THEME.grid;
+        ctx.lineWidth = 0.5; 
+        const stepY = h / numLines;
+        for(let i=0; i<=numLines; i++) {
+            let y = i * stepY;
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+        }
+        if(stepX) {
+            for(let x = 0; x < w; x += stepX) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+            }
+        }
+        ctx.stroke();
+        
+        // Axe (toujours en bas car termes positifs)
+        ctx.beginPath();
+        ctx.moveTo(0, yZero);
+        ctx.lineTo(w, yZero);
+        ctx.strokeStyle = THEME.axis;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+
+    /* --- LOGIQUE MÉTIER --- */
+
+    function generateNewScenario() {
+        GAME.startIdx = Math.random() < 0.5 ? 0 : 1;
+        
+        // StartVal : entre 2 et 10 (entier)
+        GAME.startVal = Math.floor(Math.random() * 9) + 2;
+        
+        // Raison q : choix parmi des valeurs intéressantes pour la pédagogie
+        const possibleQs = [0.5, 0.8, 1.2, 1.5, 2];
+        GAME.q = possibleQs[Math.floor(Math.random() * possibleQs.length)];
+        
+        GAME.step = 0;
+
+        const idx = GAME.startIdx;
+        document.getElementById('lbl-start-idx').innerHTML = `\\(u_${idx}\\)`;
+        document.getElementById('disp-val').textContent = GAME.startVal;
+        document.getElementById('disp-q').textContent = "× " + GAME.q;
+        
+        const endIdx = idx + 10; 
+        document.getElementById('header-global').innerHTML = `4. Projection Globale (\\(u_{${idx}}\\) à \\(u_{${endIdx}}\\))`;
+        
+        updateMaths();
+        updateVariations(); 
+        drawDiscovery();
+        drawGlobal();
+        
+        document.getElementById('narrative-1').innerHTML = `Départ à <strong>${GAME.startVal}</strong> (rang ${idx}).`;
+    }
+
+    function updateMaths() {
+        const uStart = GAME.startVal;
+        const q = GAME.q;
+        const idx = GAME.startIdx;
+        const nFormula = (idx === 0) ? "n" : "(n-1)";
+
+        const defHTML = `
+            <div style="display:flex; justify-content:space-around; flex-wrap:wrap;">
+                <div><small style="color:#94a3b8">Terme initial</small><br>\\( u_{${idx}} = ${uStart} \\)</div>
+                <div><small style="color:#94a3b8">Raison</small><br>\\( q = ${q} \\)</div>
+                <div><small style="color:#94a3b8">Récurrence</small><br>\\( u_{n+1} = u_n \\times ${q} \\)</div>
+            </div>
+            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+            <div style="text-align:center">
+                Formule explicite : \\( u_n = ${uStart} \\times ${q}^{${nFormula}} \\)
+            </div>
+        `;
+        document.getElementById('math-def-area').innerHTML = defHTML;
+
+        // Calcul de projection à +10 étapes
+        const steps = 10;
+        const uTarget = uStart * Math.pow(q, steps);
+        const targetIdx = idx + steps;
+        
+        document.getElementById('math-calc-area').innerHTML = `
+            Projection : \\( u_{${targetIdx}} = ${uStart} \\times ${q}^{${steps}} \\approx \\mathbf{${fmt(uTarget)}} \\)
+        `;
+
+        if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+    }
+
+    function updateVariations() {
+        const q = GAME.q;
+        let conclusion = "";
+        let color = "";
+        let icon = "";
+
+        // Logique géométrique pour termes positifs
+        if (q > 1) {
+            conclusion = `Comme \\( q = ${q} > 1 \\) (et \\(u_0 > 0\\)), la suite est <strong>croissante</strong>.`;
+            color = THEME.pos; 
+            icon = "↗️";
+        } else if (q < 1 && q > 0) {
+            conclusion = `Comme \\( 0 < q = ${q} < 1 \\) (et \\(u_0 > 0\\)), la suite est <strong>décroissante</strong>.`;
+            color = THEME.neg; 
+            icon = "↘️";
+        } else if (q === 1) {
+            conclusion = `Comme \\( q = 1 \\), la suite est <strong>constante</strong>.`;
+            color = THEME.axis;
+            icon = "➡️";
+        }
+
+        const html = `
+            <div class="variation-grid">
+                <div>
+                    <p style="margin-top:0; color:#64748b;">Règle (termes > 0) :</p>
+                    <ul style="padding-left: 20px; color: var(--text);">
+                        <li style="margin-bottom:8px;">Si \\( q > 1 \\), on multiplie par plus de 1 : ça <span style="color:${THEME.pos}; font-weight:bold">monte</span>.</li>
+                        <li>Si \\( 0 < q < 1 \\), on multiplie par "0,..." : ça <span style="color:${THEME.neg}; font-weight:bold">descend</span>.</li>
+                    </ul>
+                </div>
+                <div style="
+                    background: ${color}15; 
+                    border: 2px solid ${color}; 
+                    color: #334155; 
+                    padding: 20px; 
+                    border-radius: 12px; 
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <div style="font-size: 2.5rem; line-height: 1; margin-bottom: 10px;">${icon}</div>
+                    <div>${conclusion}</div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('variation-area').innerHTML = html;
+        if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+    }
+
+    /* --- CANVAS LOGIC --- */
+    function getScaleParams(h, minItems, maxItems) {
+        let values = [];
+        for(let i=0; i<=maxItems; i++) values.push(GAME.startVal * Math.pow(GAME.q, i));
+        
+        values.push(0); 
+        
+        let minVal = 0; 
+        let maxVal = Math.max(...values);
+        
+        // Marge haute
+        maxVal = maxVal * 1.1; 
+        if(maxVal === 0) maxVal = 10;
+
+        const mapY = (val) => h - ((val - minVal) / (maxVal - minVal)) * h;
+        return { mapY, minVal, maxVal };
+    }
+
+    function drawDiscovery() {
+        const cvs = document.getElementById('cvsDiscovery');
+        const { ctx, width, height } = setupCanvas(cvs); 
+        
+        // Max 8 étapes pour la découverte pas à pas
+        const S = getScaleParams(height, 0, 8);
+        const yZero = S.mapY(0);
+
+        ctx.clearRect(0, 0, width, height);
+        drawGrid(ctx, width, height, 0, yZero);
+
+        const barW = 30; 
+        const gap = 30;  
+        const startX = 60;
+
+        for(let i=0; i<=GAME.step; i++) {
+            let val = GAME.startVal * Math.pow(GAME.q, i);
+            let yVal = S.mapY(val);
+            let x = startX + i * (barW + gap);
+            let hBar = Math.abs(yVal - yZero);
+            
+            const isGrowth = GAME.q >= 1;
+            const baseColor = isGrowth ? THEME.pos : THEME.neg;
+            
+            let grad = ctx.createLinearGradient(0, yZero, 0, yVal);
+            grad.addColorStop(0, isGrowth ? THEME.posLight : THEME.negLight);
+            grad.addColorStop(1, baseColor);
+
+            ctx.fillStyle = grad;
+            ctx.fillRect(x, yVal, barW, hBar); 
+            ctx.strokeStyle = baseColor;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, yVal, barW, hBar);
+
+            // TEXTE
+            ctx.fillStyle = THEME.text;
+            ctx.font = "600 11px Inter, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(fmt(val), x + barW/2, yVal - 8);
+            
+            ctx.fillStyle = "#94a3b8"; 
+            ctx.font = "11px sans-serif";
+            ctx.fillText("u" + toSubscript(i + GAME.startIdx), x + barW/2, yZero + 20);
+        }
+    }
+
+    function stepForward() {
+        if(GAME.step < 8) { 
+            GAME.step++;
+            drawDiscovery();
+            
+            let prev = GAME.startVal * Math.pow(GAME.q, GAME.step-1);
+            let curr = GAME.startVal * Math.pow(GAME.q, GAME.step);
+            
+            let idxCurr = GAME.startIdx + GAME.step;
+            let idxPrev = idxCurr - 1;
+            
+            let latexContent = `\\( u_{${idxCurr}} = u_{${idxPrev}} \\times ${GAME.q} = ${fmt(prev)} \\times ${GAME.q} \\approx \\mathbf{${fmt(curr)}} \\)`;
+            
+            document.getElementById('narrative-1').innerHTML = `
+                <span style="color:#64748b">Étape ${GAME.step} :</span> ${latexContent}
+            `;
+            
+            if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([document.getElementById('narrative-1')]);
+        }
+    }
+
+    function resetStep() {
+        GAME.step = 0;
+        drawDiscovery();
+        document.getElementById('narrative-1').textContent = "Réinitialisé.";
+    }
+
+    function drawGlobal() {
+        const cvs = document.getElementById('cvsGlobal');
+        const { ctx, width, height } = setupCanvas(cvs);
+
+        const maxN = 10;
+        const S = getScaleParams(height, 0, maxN);
+        const yZero = S.mapY(0);
+
+        ctx.clearRect(0, 0, width, height);
+        
+        const marginX = 50;
+        const stepX = (width - 2*marginX) / maxN;
+        drawGrid(ctx, width, height, stepX, yZero, 8);
+
+        // Remplissage sous la courbe
+        ctx.beginPath();
+        for(let i=0; i<=maxN; i++) {
+            let val = GAME.startVal * Math.pow(GAME.q, i);
+            let px = marginX + i * stepX;
+            let py = S.mapY(val);
+            if(i===0) ctx.moveTo(px, yZero);
+            ctx.lineTo(px, py);
+            if(i===maxN) ctx.lineTo(px, yZero); 
+        }
+        ctx.closePath();
+        
+        const isGrowth = GAME.q >= 1;
+        const color = isGrowth ? THEME.pos : THEME.neg;
+        ctx.fillStyle = isGrowth ? THEME.posLight : THEME.negLight;
+        ctx.fill();
+
+        // Ligne
+        ctx.beginPath();
+        for(let i=0; i<=maxN; i++) {
+            let val = GAME.startVal * Math.pow(GAME.q, i);
+            let px = marginX + i * stepX;
+            let py = S.mapY(val);
+            if(i===0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5; 
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+
+        // Points
+        for(let i=0; i<=maxN; i++) {
+            let val = GAME.startVal * Math.pow(GAME.q, i);
+            let px = marginX + i * stepX;
+            let py = S.mapY(val);
+
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI*2); 
+            ctx.fillStyle = '#ffffff'; 
+            ctx.fill();
+            ctx.strokeStyle = color; 
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            if(i===0 || i===maxN) {
+                ctx.fillStyle = THEME.text;
+                ctx.font = "bold 12px Inter";
+                ctx.textAlign = "center";
+                ctx.fillText(fmt(val), px, py - 12);
+            }
+        }
+    }
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            drawDiscovery();
+            drawGlobal();
+        }, 100);
+    });
+
+</script>
+</body>
+</html>
