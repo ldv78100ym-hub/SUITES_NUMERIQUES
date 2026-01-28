@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cahier d'Exercices : Suites Arithmétiques</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined']
+            },
+            startup: {
+                typeset: false
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #e67e22; /* Orange pour les solutions */
+            --bg-color: #f4f6f7;
+            --text-color: #333;
+            --box-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2, h3 { color: var(--primary-color); }
+        h1 { text-align: center; border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .card {
+            background: var(--box-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .card.theory { border-left-color: #8e44ad; }
+        .card.problem { border-left-color: #d35400; }
+        .card.exercise { border-left-color: #27ae60; border: 2px solid #27ae60; }
+
+        /* Boutons */
+        .btn-container { text-align: center; margin: 20px 0; display: flex; justify-content: center; gap: 15px; }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn-refresh { background-color: var(--primary-color); color: white; }
+        .btn-refresh:hover { background-color: #34495e; }
+
+        /* Bouton Spécifique Solution */
+        .btn-show-sol {
+            background-color: var(--warning-color);
+            color: white;
+            font-weight: bold;
+            display: block;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .btn-show-sol:hover { background-color: #d35400; }
+
+        /* Zone de solution cachée par défaut */
+        .solution-box {
+            display: none; /* CACHÉ PAR DÉFAUT */
+            background-color: #e8f6f3;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #d1f2eb;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .highlight { font-weight: bold; color: var(--accent-color); }
+        
+        canvas { background: #fff; border: 1px solid #ccc; display: block; margin: 10px auto; max-width: 100%; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: black; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Entraînement : Suites Arithmétiques</h1>
+    
+    <div class="btn-container">
+        <button class="btn-refresh" onclick="generateContent()">🔄 Générer un nouveau sujet (Aléatoire)</button>
+        <button style="background:#7f8c8d; color:white;" onclick="openModal()">⚖️ Crédits</button>
+    </div>
+
+    <div class="card">
+        <h2>1. Reconnaître une suite (Récurrence)</h2>
+        <div id="ex-recurrence"></div>
+    </div>
+
+    <div class="card theory">
+        <h2>2. Formule explicite</h2>
+        <div id="ex-explicit"></div>
+    </div>
+
+    <div class="card">
+        <h2>3. Représentation Graphique</h2>
+        <p>Observez la disposition des points ci-dessous.</p>
+        <div id="ex-graph-text"></div>
+        <canvas id="canvasGraph" width="500" height="300"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>4. Prouver qu'une suite n'est PAS arithmétique</h2>
+        <div id="ex-counter"></div>
+    </div>
+
+    <div class="card problem">
+        <h2>5. Problème de la vie courante</h2>
+        <div id="pbl-content"></div>
+    </div>
+
+    <div class="card exercise">
+        <h2 style="color:#27ae60;">6. Exercices d'Entraînement Rapide</h2>
+        <p>À vous de jouer ! Prenez une feuille, faites le calcul, puis vérifiez.</p>
+        <hr style="border:0; border-top:1px dashed #ccc;">
+        <div id="drill-exercises"></div>
+    </div>
+
+</div>
+
+<div id="copyrightModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>⚖️ Droits d'Auteur</h3>
+        <p><strong>Auteur :</strong> Yann Merdy - Janvier 2026</p>
+        <p>Utilisation personnelle et éducative autorisée.</p>
+    </div>
+</div>
+
+<script>
+    /**
+     * Outils
+     */
+    function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function formatSignedNumber(n) { return n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`; }
+
+    /**
+     * Fonction Principale : AFFICHER / MASQUER SOLUTION
+     */
+    function toggleSol(id) {
+        let box = document.getElementById('sol-' + id);
+        let btn = document.getElementById('btn-' + id);
+        
+        if (box.style.display === "none" || box.style.display === "") {
+            box.style.display = "block";
+            btn.innerHTML = "🙈 Masquer la solution";
+            btn.style.backgroundColor = "#7f8c8d"; // Devient gris
+        } else {
+            box.style.display = "none";
+            btn.innerHTML = "👁️ Voir la solution";
+            btn.style.backgroundColor = "#e67e22"; // Revient orange
+        }
+    }
+
+    /**
+     * Génération du contenu
+     */
+    function generateContent() {
+        generateRecurrence();
+        generateExplicit(); 
+        generateCounterExample();
+        generateGraph();
+        generatePBL();
+        generateDrills(); // Les exos supplémentaires
+        
+        if (window.MathJax) { MathJax.typesetPromise(); }
+    }
+
+    /* 1. Recurrence */
+    function generateRecurrence() {
+        let u0 = getRandomInt(-20, 20);
+        let r = getRandomInt(-10, 10);
+        while(r === 0) r = 5;
+        
+        let html = `
+            <p>Soit la suite définie par \\( u_0 = ${u0} \\) et \\( u_{n+1} = u_n ${formatSignedNumber(r)} \\).</p>
+            <p><strong>Question :</strong> Quelle est la nature de cette suite ? Donnez sa raison.</p>
+            
+            <button id="btn-rec" class="btn-show-sol" onclick="toggleSol('rec')">👁️ Voir la solution</button>
+            <div id="sol-rec" class="solution-box">
+                <p>La différence \\( u_{n+1} - u_n = ${r} \\) est constante.</p>
+                <p>C'est donc une suite <strong>arithmétique</strong> de raison \\( r = ${r} \\).</p>
+            </div>
+        `;
+        document.getElementById('ex-recurrence').innerHTML = html;
+    }
+
+    /* 2. Explicit */
+    function generateExplicit() {
+        let a = getRandomInt(-10, 10);
+        while (a === 0) a = 3;
+        let b = getRandomInt(-20, 20);
+        
+        let html = `
+            <p>Soit la suite définie par : \\( u_n = ${a}n ${formatSignedNumber(b)} \\).</p>
+            <p><strong>Question :</strong> Prouvez qu'elle est arithmétique.</p>
+
+            <button id="btn-exp" class="btn-show-sol" onclick="toggleSol('exp')">👁️ Voir la solution</button>
+            <div id="sol-exp" class="solution-box">
+                <p>Calculons \\( u_{n+1} - u_n \\) :</p>
+                <p>\\( u_{n+1} = ${a}(n+1) ${formatSignedNumber(b)} = ${a}n + ${a} ${formatSignedNumber(b)} \\)</p>
+                <p>\\( u_{n+1} - u_n = (${a}n + ${a} ${formatSignedNumber(b)}) - (${a}n ${formatSignedNumber(b)}) = ${a} \\).</p>
+                <p>Le résultat est constant. La suite est arithmétique de raison \\( r = ${a} \\).</p>
+            </div>
+        `;
+        document.getElementById('ex-explicit').innerHTML = html;
+    }
+
+    /* 3. Graphique (Pas de solution à cacher ici, c'est visuel) */
+    function generateGraph() {
+        let canvas = document.getElementById('canvasGraph');
+        let ctx = canvas.getContext('2d');
+        let u0 = getRandomInt(-5, 5);
+        let r = getRandomInt(1, 4);
+        
+        document.getElementById('ex-graph-text').innerHTML = `
+            <p>Suite : \\( u_0=${u0} \\) et \\( r=${r} \\). Les points sont-ils alignés ?</p>
+        `;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let margin = 40;
+        let w = canvas.width - 2 * margin;
+        let h = canvas.height - 2 * margin;
+        let maxY = u0 + 5 * r;
+        let minY = Math.min(0, u0);
+        let rangeY = maxY - minY + 2;
+        let scaleX = w / 5;
+        let scaleY = h / rangeY;
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.moveTo(margin, margin); ctx.lineTo(margin, canvas.height - margin);
+        let yZero = canvas.height - margin - (0 - minY) * scaleY;
+        if (yZero > canvas.height - margin) yZero = canvas.height - margin;
+        if (yZero < margin) yZero = margin;
+        ctx.moveTo(margin, yZero); ctx.lineTo(canvas.width - margin, yZero);
+        ctx.stroke();
+
+        ctx.fillStyle = '#e74c3c';
+        for(let n=0; n<5; n++) {
+            let un = u0 + n * r;
+            let px = margin + n * scaleX;
+            let py = canvas.height - margin - (un - minY) * scaleY;
+            ctx.beginPath(); ctx.arc(px, py, 6, 0, 2 * Math.PI); ctx.fill();
+            ctx.fillStyle = '#000'; ctx.font = '12px Arial'; ctx.fillText(`u${n}`, px + 5, py - 10); ctx.fillStyle = '#e74c3c';
+        }
+    }
+
+    /* 4. Contre-exemple */
+    function generateCounterExample() {
+        let c = getRandomInt(-10, 10);
+        let html = `
+            <p>Soit \\( u_n = n^2 ${formatSignedNumber(c)} \\).</p>
+            <p><strong>Question :</strong> Est-ce une suite arithmétique ? Justifiez.</p>
+            
+            <button id="btn-count" class="btn-show-sol" onclick="toggleSol('count')">👁️ Voir la solution</button>
+            <div id="sol-count" class="solution-box">
+                <p>Calculons les premiers termes :</p>
+                <ul>
+                    <li>\\( u_0 = 0^2 ${formatSignedNumber(c)} = ${c} \\)</li>
+                    <li>\\( u_1 = 1^2 ${formatSignedNumber(c)} = ${1+c} \\) (écart = +1)</li>
+                    <li>\\( u_2 = 2^2 ${formatSignedNumber(c)} = ${4+c} \\) (écart = +3)</li>
+                </ul>
+                <p>L'écart n'est pas constant ($1 \\neq 3$). Ce n'est <strong>PAS</strong> une suite arithmétique.</p>
+            </div>
+        `;
+        document.getElementById('ex-counter').innerHTML = html;
+    }
+
+    /* 5. PBL */
+    function generatePBL() {
+        let initial = getRandomInt(20, 100);
+        let saving = getRandomInt(10, 30);
+        
+        let html = `
+            <p>Paul a ${initial} € et économise ${saving} € par mois.</p>
+            <p><strong>Question :</strong> Combien aura-t-il dans 10 mois ?</p>
+            
+            <button id="btn-pbl" class="btn-show-sol" onclick="toggleSol('pbl')">👁️ Voir la solution</button>
+            <div id="sol-pbl" class="solution-box">
+                <p>C'est une suite arithmétique : \\( u_n = ${initial} + n \\times ${saving} \\).</p>
+                <p>Pour \\( n=10 \\) :</p>
+                <p>\\( u_{10} = ${initial} + 10 \\times ${saving} = ${initial} + ${10*saving} = \\mathbf{${initial + 10*saving}} \\) €.</p>
+            </div>
+        `;
+        document.getElementById('pbl-content').innerHTML = html;
+    }
+
+    /* 6. EXERCICES DRILL (NOUVEAU) */
+    function generateDrills() {
+        let container = document.getElementById('drill-exercises');
+        let html = "";
+
+        // EXERCICE A : Trouver u_n
+        let u0_a = getRandomInt(1, 10);
+        let r_a = getRandomInt(2, 6);
+        let n_a = getRandomInt(20, 40);
+        let res_a = u0_a + n_a * r_a;
+
+        html += `
+        <div style="margin-bottom:30px;">
+            <p><strong>Exercice A :</strong> \\( (u_n) \\) est arithmétique de raison \\( r=${r_a} \\) et \\( u_0=${u0_a} \\). Calculer \\( u_{${n_a}} \\).</p>
+            <button id="btn-dr1" class="btn-show-sol" onclick="toggleSol('dr1')">👁️ Voir la solution</button>
+            <div id="sol-dr1" class="solution-box">
+                <p>Formule : \\( u_n = u_0 + n \\times r \\)</p>
+                <p>\\( u_{${n_a}} = ${u0_a} + ${n_a} \\times ${r_a} = ${u0_a} + ${n_a*r_a} = \\mathbf{${res_a}} \\)</p>
+            </div>
+        </div>`;
+
+        // EXERCICE B : Trouver la raison
+        let u0_b = getRandomInt(5, 20);
+        let u5_b = getRandomInt(30, 80);
+        // On s'assure que (u5 - u0) est divisible par 5 pour avoir un entier
+        while ((u5_b - u0_b) % 5 !== 0) { u5_b++; }
+        let r_b = (u5_b - u0_b) / 5;
+
+        html += `
+        <div style="margin-bottom:30px;">
+            <p><strong>Exercice B :</strong> Une suite arithmétique vérifie \\( u_0=${u0_b} \\) et \\( u_5=${u5_b} \\). Quelle est sa raison \\( r \\) ?</p>
+            <button id="btn-dr2" class="btn-show-sol" onclick="toggleSol('dr2')">👁️ Voir la solution</button>
+            <div id="sol-dr2" class="solution-box">
+                <p>On sait que \\( u_5 = u_0 + 5r \\).</p>
+                <p>Donc \\( 5r = u_5 - u_0 = ${u5_b} - ${u0_b} = ${u5_b - u0_b} \\).</p>
+                <p>\\( r = \\frac{${u5_b - u0_b}}{5} = \\mathbf{${r_b}} \\).</p>
+            </div>
+        </div>`;
+
+        container.innerHTML = html;
+    }
+
+    /** Gestion Modale **/
+    let modal = document.getElementById("copyrightModal");
+    function openModal() { modal.style.display = "block"; }
+    function closeModal() { modal.style.display = "none"; }
+    window.onclick = function(e) { if (e.target == modal) closeModal(); }
+
+    window.onload = generateContent;
+</script>
+
+</body>
+</html>
