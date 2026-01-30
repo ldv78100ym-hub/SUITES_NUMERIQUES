@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cours et Exercices Dynamiques : Les Suites Arithmétiques (Aléatoires)</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --bg-sidebar: #1e293b;
+            --bg-main: #f8fafc;
+            --text-dark: #0f172a;
+            --text-light: #f1f5f9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .exercise-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .exercise-item {
+            padding: 15px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .exercise-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .exercise-item.active {
+            background: var(--primary);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .exercise-number {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--text-dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            flex-shrink: 0;
+        }
+
+        .top-bar h1 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        .top-bar h1 strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--text-dark);
+            border: 2px solid var(--accent);
+        }
+
+        .btn-accent:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .random-indicator {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid var(--accent);
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            background: white;
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .slide::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .slide::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .slide::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 8px;
+            border: 2px solid white;
+        }
+
+        .slide::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        .slide-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary);
+            flex-shrink: 0;
+        }
+
+        .slide-category {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--text-dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slide h2 {
+            font-size: 2.2rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .slide-content {
+            flex: 1;
+            font-size: 1.3rem;
+            line-height: 1.7;
+            color: var(--text-dark);
+            overflow-y: visible;
+        }
+
+        .slide-content p {
+            margin-bottom: 20px;
+        }
+
+        .math-block {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary);
+            font-size: 1.2rem;
+            overflow-x: auto;
+        }
+
+        .graph-container {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .navigation-hint {
+            position: absolute;
+            bottom: 30px;
+            right: 60px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .nav-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.2rem;
+        }
+
+        .nav-arrow:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .nav-arrow:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+        }
+
+        .solution-step {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 3px solid var(--success);
+        }
+
+        .solution-step h4 {
+            color: var(--success);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide {
+            animation: fadeIn 0.4s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: 260px; }
+            .slide { padding: 40px; }
+            .slide h2 { font-size: 1.8rem; }
+            .slide-content { font-size: 1.1rem; }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; max-height: 35vh; }
+            .slide-container { padding: 20px; }
+            .slide { padding: 30px; }
+            .navigation-hint { right: 30px; bottom: 20px; }
+            .controls { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📚 Menu des Exercices</h2>
+        </div>
+        <div class="exercise-list" id="exerciseList">
+        </div>
+        <div class="sidebar-footer">
+            Suites Arithmétiques Aléatoires © 2025
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <h1><strong>Mathématiques</strong> | Suites Arithmétiques Dynamiques</h1>
+            <div class="controls">
+                <button class="btn btn-accent" onclick="regenerateAll()">
+                    <span>🎲</span> Nouvelles valeurs
+                </button>
+                <button class="btn btn-secondary" onclick="openCopyright()">
+                    <span>⚖️</span> Droits d'auteur
+                </button>
+                <button class="btn btn-primary" onclick="openSolution()">
+                    <span>💡</span> Voir la solution
+                </button>
+            </div>
+        </div>
+
+        <div class="slide-container">
+            
+            <div class="slide" id="currentSlide">
+            </div>
+            <div class="navigation-hint">
+                <span>Navigation :</span>
+                <button class="nav-arrow" onclick="prevExercise()" id="btnPrev">←</button>
+                <button class="nav-arrow" onclick="nextExercise()" id="btnNext">→</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="solutionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>💡 Solution détaillée</h3>
+                <button class="modal-close" onclick="closeModal('solutionModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="solutionContent">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="copyrightModal">
+        <div class="modal">
+            <div class="modal-header" style="background: #1e293b;">
+                <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
+                <button class="modal-close" onclick="closeModal('copyrightModal')">&times;</button>
+            </div>
+            <div class="modal-body" style="font-size: 0.95rem; line-height: 1.6;">
+                <p><strong>Auteur :</strong> Yann Merdy (yann.merdy@gmail.com) - Janvier 2026</p>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 10px 0;">Licence d'Utilisation Non Commerciale</h4>
+                
+                <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Les Évolutions") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
+                
+                <h4 style="color: var(--success); margin: 20px 0 10px 0;">Conditions :</h4>
+                
+                <p><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu uniquement à des fins personnelles, éducatives et non lucratives.</p>
+                
+                <p><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins commerciales, lucratives ou professionnelles est strictement interdite sans un accord écrit préalable et explicite de l'auteur.</p>
+                
+                <p><strong>Attribution :</strong> Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</p>
+                
+                <p style="margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px;">
+                    Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Stockage des valeurs aléatoires actuelles
+        let currentValues = {};
+        let currentExercise = 0;
+
+        // Fonctions utilitaires pour générer des nombres aléatoires
+        const rand = {
+            int: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+            choice: (arr) => arr[Math.floor(Math.random() * arr.length)],
+            shuffle: (arr) => {
+                const newArr = [...arr];
+                for (let i = newArr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+                }
+                return newArr;
+            },
+            // Génère un multiple de step entre min et max
+            multiple: (min, max, step) => {
+                const steps = Math.floor((max - min) / step);
+                return min + Math.floor(Math.random() * (steps + 1)) * step;
+            }
+        };
+
+        // Générateurs de valeurs aléatoires pour chaque exercice
+        const generators = {
+            1: () => {
+                // EXERCICE 1 : 2/3 chance d'être arithmétique, 1/3 non
+                const isArithmetic = Math.random() < 0.666;
+                
+                if (isArithmetic) {
+                    // Suite arithmétique : population avec croissance constante
+                    const u0 = rand.int(2, 10);
+                    const r = rand.int(2, 5);
+                    return {
+                        isArithmetic: true,
+                        u0, r,
+                        u1: u0 + r,
+                        u2: u0 + 2*r,
+                        u3: u0 + 3*r,
+                        diff1: r,
+                        diff2: r
+                    };
+                } else {
+                    // Suite géométrique : population avec croissance exponentielle
+                    const u0 = rand.int(1, 5);
+                    const q = rand.int(2, 4);
+                    return {
+                        isArithmetic: false,
+                        u0, q,
+                        u1: u0 * q,
+                        u2: u0 * q * q,
+                        u3: u0 * q * q * q,
+                        diff1: u0 * (q - 1),
+                        diff2: u0 * q * (q - 1)
+                    };
+                }
+            },
+            2: () => {
+                // Ex 2: Dépréciation linéaire
+                const duree = rand.int(4, 8);
+                const depreciation = rand.multiple(2000, 15000, 1000);
+                const initial = depreciation * duree;
+                const annees = rand.int(2, duree - 1);
+                return { initial, duree, depreciation, annees };
+            },
+            3: () => {
+                // Ex 3: Remboursement dette
+                const mensualite = rand.multiple(100, 500, 50);
+                const moisTotal = rand.int(24, 60);
+                const initial = mensualite * moisTotal;
+                const mois1 = rand.int(5, 15);
+                const mois2 = rand.int(20, 40);
+                return { initial, mensualite, moisTotal, mois1, mois2 };
+            },
+            4: () => {
+                // Ex 4: Température altitude
+                const gradient = (rand.int(5, 10) / 10);
+                const temp0 = rand.int(15, 25);
+                const alt1 = rand.int(5, 15);
+                const alt2 = rand.int(16, 25);
+                return { gradient, temp0, alt1, alt2 };
+            },
+            5: () => {
+                // Ex 5: Training sportif
+                const depart = rand.int(10, 20);
+                const increment = rand.int(2, 5);
+                const duree = rand.int(6, 10);
+                const dureeCritique = duree + rand.int(8, 15);
+                const final = depart + (duree - 1) * increment;
+                const critique = depart + (dureeCritique - 1) * increment;
+                return { depart, increment, duree, dureeCritique, final, critique };
+            },
+            6: () => {
+                // Ex 6: Vidange réservoir
+                const initial = rand.multiple(3000, 8000, 500);
+                const fixe = rand.multiple(150, 400, 50);
+                const pourcentage = rand.int(3, 8);
+                const duree = 5;
+                const volFixe = initial - fixe * duree;
+                const volPct = Math.round(initial * Math.pow(1 - pourcentage/100, duree));
+                return { initial, fixe, pourcentage, duree, volFixe, volPct };
+            },
+            7: () => {
+                // EXERCICE 7 : Exactement 2 situations arithmétiques sur 3
+                // On mélange les types pour que ce soit aléatoire quelle est la "mauvaise"
+                const types = rand.shuffle([
+                    { isArith: true, type: 'reduction' },   // Réduction constante
+                    { isArith: true, type: 'augmentation' }, // Augmentation constante
+                    { isArith: false, type: 'geometrique' }  // Doublement (géométrique)
+                ]);
+                
+                // Génération des valeurs pour chaque situation
+                const situations = types.map(t => {
+                    if (t.type === 'reduction') {
+                        const prix = rand.int(30, 60);
+                        const reduc = rand.int(2, 5);
+                        return {
+                            ...t,
+                            prix, reduc,
+                            texte: `Un abonnement à une salle de sport coûte ${prix} € le premier mois. Chaque mois suivant, le prix diminue de ${reduc} € par rapport au mois précédent, jusqu'à un prix plancher.`,
+                            conclusion: `Oui, c'est une suite arithmétique de raison r = -${reduc} (décroissante).`,
+                            relation: `u_{n+1} = u_n - ${reduc}`
+                        };
+                    } else if (t.type === 'augmentation') {
+                        const cout = rand.multiple(100, 300, 50);
+                        const aug = rand.multiple(15, 40, 5);
+                        return {
+                            ...t,
+                            cout, aug,
+                            texte: `Pour creuser un puits, un foreur demande ${cout} € pour le premier mètre creusé. Pour chaque mètre supplémentaire, le coût augmente de ${aug} € par rapport au coût du mètre précédent.`,
+                            conclusion: `Oui, c'est une suite arithmétique de raison r = ${aug} (croissante).`,
+                            relation: `c_{n+1} = c_n + ${aug}`
+                        };
+                    } else {
+                        // Géométrique
+                        const init = rand.int(50, 150);
+                        return {
+                            ...t,
+                            init,
+                            texte: `Une population de bactéries double toutes les heures dans un milieu de culture. On relève ${init} bactéries au départ.`,
+                            conclusion: `Non, ce n'est pas une suite arithmétique. C'est une suite géométrique de raison q = 2.`,
+                            relation: `v_{n+1} = 2 \\times v_n`
+                        };
+                    }
+                });
+
+                return { situations };
+            },
+            8: () => {
+                // Ex 8: Argent de poche
+                const initial = rand.multiple(20, 100, 5);
+                const mensuel = rand.multiple(10, 30, 5);
+                const mois = 4;
+                const final = initial + mensuel * mois;
+                return { initial, mensuel, mois, final };
+            },
+            9: () => {
+                // Ex 9: Photocopieuse
+                const initial = rand.multiple(300, 800, 50);
+                const increment = rand.multiple(30, 100, 10);
+                const max = rand.multiple(5000, 15000, 1000);
+                const limite = Math.floor((max - initial) / increment);
+                return { initial, increment, max, limite };
+            },
+            10: () => {
+                // Ex 10: Empilement cubes
+                const debut = rand.int(12, 20);
+                const raison = -rand.int(1, 3);
+                const rangee6 = debut + 5 * raison;
+                const limite = Math.floor(-debut / raison) + 1;
+                const rangee10 = debut + 9 * raison;
+                return { debut, raison: Math.abs(raison), rangee6, limite, rangee10 };
+            },
+            11: () => {
+                // Ex 11: Détermination paramètres
+                const r = rand.multiple(10, 50, 5);
+                const u0 = rand.multiple(20, 100, 10);
+                const idx1 = rand.int(3, 6);
+                const idx2 = idx1 + rand.int(3, 6);
+                const uIdx1 = u0 + idx1 * r;
+                const uIdx2 = u0 + idx2 * r;
+                const idx3 = idx2 + rand.int(2, 4);
+                const uIdx3 = u0 + idx3 * r;
+                return { r, u0, idx1, idx2, uIdx1, uIdx2, idx3, uIdx3 };
+            },
+            12: () => {
+                // Ex 12: Graphique avec 3 cas
+                // 50% alignés, 25% presque alignés, 25% non alignés
+                const randVal = Math.random();
+                let type;
+                if (randVal < 0.5) {
+                    type = 'aligned'; // 50%
+                } else if (randVal < 0.75) {
+                    type = 'almost'; // 25%
+                } else {
+                    type = 'not_aligned'; // 25%
+                }
+                
+                const h0 = rand.int(3, 10);
+                const r = rand.int(3, 8);
+                const maxWeeks = 5;
+                const targetWeek = 8;
+                
+                // Calcul des hauteurs selon le type
+                const heights = [];
+                const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+                
+                for (let i = 0; i <= 5; i++) {
+                    let h;
+                    if (type === 'aligned') {
+                        // Parfaitement alignés
+                        h = h0 + i * r;
+                    } else if (type === 'almost') {
+                        // Presque alignés (petites erreurs aléatoires)
+                        const error = rand.choice([-2, -1, 0, 0, 0, 1, 2]);
+                        h = h0 + i * r + error;
+                        // S'assurer que h reste positif
+                        h = Math.max(2, h);
+                    } else {
+                        // Non alignés (croissance qui accélère ou ralentit)
+                        if (i === 0) {
+                            h = h0;
+                        } else if (i === 1) {
+                            h = h0 + r + rand.int(2, 4); // Croissance plus forte
+                        } else if (i === 2) {
+                            h = h0 + 2*r + rand.int(4, 7);
+                        } else if (i === 3) {
+                            h = h0 + 3*r + rand.int(1, 3); // Ralentissement
+                        } else if (i === 4) {
+                            h = h0 + 4*r + rand.int(5, 9); // Re-accélération
+                        } else {
+                            h = h0 + 5*r + rand.int(2, 5);
+                        }
+                    }
+                    heights.push({
+                        week: i,
+                        height: h,
+                        label: labels[i],
+                        x: 50 + i * 80,
+                        y: 250 - (h * 30) // Echelle : 1 unité = 30px, base à 250
+                    });
+                }
+                
+                // Calculer les différences entre semaines consécutives
+                const diffs = [];
+                for (let i = 0; i < heights.length - 1; i++) {
+                    diffs.push(heights[i+1].height - heights[i].height);
+                }
+                
+                const finalHeight = type === 'aligned' ? h0 + targetWeek * r : 
+                                   type === 'almost' ? h0 + targetWeek * r : 
+                                   null; // Non calculable pour non alignés
+                
+                return { 
+                    type, 
+                    h0, 
+                    r, 
+                    maxWeeks: 5, 
+                    targetWeek: 8, 
+                    heights, 
+                    diffs, 
+                    finalHeight 
+                };
+            }
+        };
+
+        // Templates des exercices (fonctions qui retournent le HTML avec les valeurs)
+        const exerciseTemplates = {
+            1: (v) => ({
+                category: "Identification du modèle",
+                title: "Évolution d'une population de bactéries",
+                content: `
+                    <p>Un biologiste observe une population de bactéries. Il relève les effectifs suivants (en milliers) :</p>
+                    <div class="math-block">
+                        \\begin{array}{|c|c|c|c|c|}
+                        \\hline
+                        \\text{Heure } n & 0 & 1 & 2 & 3 \\\\
+                        \\hline
+                        \\text{Population} & ${v.u0} & ${v.u1} & ${v.u2} & ${v.u3} \\\\
+                        \\hline
+                        \\end{array}
+                    </div>
+                    <p><strong>Question :</strong> Cette évolution peut-elle être modélisée par une suite arithmétique ?</p>
+                    <p>Justifier rigoureusement votre réponse en analysant les variations entre termes consécutifs.</p>
+                    <p style="margin-top: 30px; color: var(--secondary); font-size: 1.1rem;">💡 <em>Pour vous aider : calculez les différences entre termes successifs.</em></p>
+                `,
+                solution: v.isArithmetic ? `
+                    <div class="solution-step">
+                        <h4>Analyse des différences</h4>
+                        <p>Vérifions si les accroissements sont constants :</p>
+                        <ul>
+                            <li>Entre \\(n=0\\) et \\(n=1\\) : \\( ${v.u1} - ${v.u0} = ${v.diff1} \\)</li>
+                            <li>Entre \\(n=1\\) et \\(n=2\\) : \\( ${v.u2} - ${v.u1} = ${v.diff2} \\)</li>
+                            <li>Entre \\(n=2\\) et \\(n=3\\) : \\( ${v.u3} - ${v.u2} = ${v.u3 - v.u2} \\)</li>
+                        </ul>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Conclusion</h4>
+                        <p>Les différences sont égales (constantes et égales à ${v.r}).</p>
+                        <p><strong>Oui, c'est une suite arithmétique</strong> de raison \\(r = ${v.r}\\).</p>
+                        <p>La croissance est linéaire (ajout de ${v.r} milliers de bactéries par heure).</p>
+                    </div>
+                ` : `
+                    <div class="solution-step">
+                        <h4>Analyse des différences</h4>
+                        <p>Vérifions si les accroissements sont constants :</p>
+                        <ul>
+                            <li>Entre \\(n=0\\) et \\(n=1\\) : \\( ${v.u1} - ${v.u0} = ${v.diff1} \\)</li>
+                            <li>Entre \\(n=1\\) et \\(n=2\\) : \\( ${v.u2} - ${v.u1} = ${v.diff2} \\)</li>
+                        </ul>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Conclusion</h4>
+                        <p>Les différences ne sont pas égales (\\(${v.diff1} \\neq ${v.diff2}\\)).</p>
+                        <p><strong>Ce n'est pas une suite arithmétique.</strong></p>
+                        <p>Il s'agit en réalité d'une <em>suite géométrique</em> de raison \\(q = ${v.q}\\) (croissance exponentielle typique des populations bactériennes).</p>
+                    </div>
+                `
+            }),
+            2: (v) => ({
+                category: "Modélisation dégressive",
+                title: "Dépréciation linéaire d'une machine",
+                content: `
+                    <p>Une entreprise achète une machine pour <strong>${v.initial.toLocaleString()} €</strong>.</p>
+                    <p>Elle applique une dépréciation linéaire sur ${v.duree} ans : chaque année, la machine perd <strong>${v.depreciation.toLocaleString()} €</strong> de valeur.</p>
+                    <div class="math-block">
+                        \\(\\text{Soit } v_n \\text{ la valeur au bout de } n \\text{ années}\\)
+                    </div>
+                    <p><strong>Questions :</strong></p>
+                    <ol>
+                        <li>Exprimer \\(v_{n+1}\\) en fonction de \\(v_n\\) (relation de récurrence)</li>
+                        <li>Préciser la nature de la suite, son premier terme et sa raison</li>
+                        <li>Quel est le sens de variation ? Interpréter concrètement</li>
+                        <li>Quelle sera la valeur après ${v.annees} ans ?</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Relation de récurrence</h4>
+                        <p>Chaque année, on soustrait ${v.depreciation.toLocaleString()} € :</p>
+                        <p>\\[v_{n+1} = v_n - ${v.depreciation.toLocaleString()} \\quad \\text{avec} \\quad v_0 = ${v.initial.toLocaleString()}\\]</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Nature de la suite</h4>
+                        <p>C'est une <strong>suite arithmétique</strong> :</p>
+                        <ul>
+                            <li>Premier terme : \\(v_0 = ${v.initial.toLocaleString()}\\) €</li>
+                            <li>Raison : \\(r = -${v.depreciation.toLocaleString()}\\)</li>
+                        </ul>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Sens de variation</h4>
+                        <p>La raison \\(r = -${v.depreciation.toLocaleString()} < 0\\), donc la suite est <strong>strictement décroissante</strong>.</p>
+                        <p><em>Interprétation :</em> La valeur de la machine diminue régulièrement de ${v.depreciation.toLocaleString()} € par an jusqu'à atteindre 0 € au bout de ${v.duree} ans.</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>4. Calcul après ${v.annees} ans</h4>
+                        <p>\\(v_{${v.annees}} = ${v.initial.toLocaleString()} - ${v.annees} \\times ${v.depreciation.toLocaleString()} = \\mathbf{${(v.initial - v.depreciation * v.annees).toLocaleString()}}\\) €</p>
+                    </div>
+                `
+            }),
+            3: (v) => ({
+                category: "Application financière",
+                title: "Échelonnement de dette",
+                content: `
+                    <p>Une association doit rembourser une dette de <strong>${v.initial.toLocaleString()} €</strong>.</p>
+                    <p>Chaque mois, elle rembourse <strong>${v.mensualite} €</strong> d'amortissement du capital (hors intérêts).</p>
+                    <div class="math-block">
+                        \\(d_n = \\text{dette restante après } n \\text{ mois}\\)
+                    </div>
+                    <p><strong>Questions :</strong></p>
+                    <ol>
+                        <li>Montrer que \\((d_n)\\) est arithmétique en justifiant par la relation de récurrence \\(d_{n+1} = d_n + r\\)</li>
+                        <li>Préciser \\(d_0\\) et la raison \\(r\\)</li>
+                        <li>Calculer la dette restante après ${v.mois1} mois, puis ${v.mois2} mois</li>
+                        <li>Au bout de combien de mois la dette est-elle totalement remboursée ?</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Nature de la suite</h4>
+                        <p>Relation : \\(d_{n+1} = d_n - ${v.mensualite}\\) avec \\(d_0 = ${v.initial.toLocaleString()}\\)</p>
+                        <p>Forme \\(u_{n+1} = u_n + r\\) avec \\(r = -${v.mensualite}\\).</p>
+                        <p><strong>C'est une suite arithmétique</strong> de raison négative (dette qui diminue).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Caractéristiques</h4>
+                        <ul>
+                            <li>\\(d_0 = ${v.initial.toLocaleString()}\\) € (dette initiale)</li>
+                            <li>\\(r = -${v.mensualite}\\) (remboursement mensuel)</li>
+                        </ul>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Calculs par itération</h4>
+                        <p>Après ${v.mois1} mois : \\(d_{${v.mois1}} = ${v.initial.toLocaleString()} - ${v.mois1} \\times ${v.mensualite} = ${v.initial.toLocaleString()} - ${v.mois1 * v.mensualite} = \\mathbf{${(v.initial - v.mois1 * v.mensualite).toLocaleString()}}\\) €</p>
+                        <p>Après ${v.mois2} mois : \\(d_{${v.mois2}} = ${v.initial.toLocaleString()} - ${v.mois2} \\times ${v.mensualite} = ${v.initial.toLocaleString()} - ${v.mois2 * v.mensualite} = \\mathbf{${(v.initial - v.mois2 * v.mensualite).toLocaleString()}}\\) €</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>4. Remboursement total</h4>
+                        <p>On résout : \\(${v.initial.toLocaleString()} - ${v.mensualite}n \\leq 0\\)</p>
+                        <p>\\(${v.mensualite}n \\geq ${v.initial.toLocaleString()}\\) donc \\(n \\geq \\frac{${v.initial.toLocaleString()}}{${v.mensualite}} = ${v.moisTotal}\\)</p>
+                        <p>La dette sera remboursée au bout de <strong>${v.moisTotal} mois (${(v.moisTotal/12).toFixed(1)} ans)</strong>.</p>
+                    </div>
+                `
+            }),
+            4: (v) => ({
+                category: "Phénomène physique",
+                title: "Température et altitude",
+                content: `
+                    <p>En métrologie, on considère que la température de l'air diminue de <strong>${v.gradient}°C</strong> tous les 100 mètres d'altitude (troposphère).</p>
+                    <p>Au niveau de la mer (altitude 0 m), la température est de <strong>${v.temp0}°C</strong>.</p>
+                    <div class="math-block">
+                        \\(t_n = \\text{température (°C) à l'altitude } 100n \\text{ mètres}\\)
+                    </div>
+                    <p><strong>Questions :</strong></p>
+                    <ol>
+                        <li>Justifier que \\((t_n)\\) est arithmétique en écrivant la relation de récurrence</li>
+                        <li>Préciser le premier terme et la raison. Quel est leur signe ?</li>
+                        <li>Calculer \\(t_{${v.alt1}}\\) et \\(t_{${v.alt2}}\\). Interpréter.</li>
+                        <li>Étudier le sens de variation et sa cohérence physique</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Modélisation</h4>
+                        <p>\\(t_{n+1} = t_n - ${v.gradient}\\) avec \\(t_0 = ${v.temp0}\\)</p>
+                        <p>C'est bien de la forme \\(u_{n+1} = u_n + r\\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Caractéristiques</h4>
+                        <p>Suite arithmétique :</p>
+                        <ul>
+                            <li>Premier terme : \\(t_0 = ${v.temp0}\\) (positif)</li>
+                            <li>Raison : \\(r = -${v.gradient}\\) (négatif)</li>
+                        </ul>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Calculs</h4>
+                        <p>\\(t_{${v.alt1}} = ${v.temp0} - ${v.alt1} \\times ${v.gradient} = ${v.temp0} - ${(v.alt1 * v.gradient).toFixed(1).replace('.0', '')} = \\mathbf{${(v.temp0 - v.alt1 * v.gradient).toFixed(1).replace('.0', '')}}\\)°C (à ${v.alt1 * 100} m d'altitude)</p>
+                        <p>\\(t_{${v.alt2}} = ${v.temp0} - ${v.alt2} \\times ${v.gradient} = ${v.temp0} - ${(v.alt2 * v.gradient).toFixed(1).replace('.0', '')} = \\mathbf{${(v.temp0 - v.alt2 * v.gradient).toFixed(1).replace('.0', '')}}\\)°C (à ${v.alt2 * 100} m d'altitude)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>4. Analyse</h4>
+                        <p>\\(r = -${v.gradient} < 0\\) : suite <strong>strictement décroissante</strong>.</p>
+                        <p>C'est cohérent physiquement : plus on monte en altitude, plus il fait froid (gradient thermique atmosphérique).</p>
+                    </div>
+                `
+            }),
+            5: (v) => ({
+                category: "Problème ouvert critique",
+                title: "Training sportif et limites du modèle",
+                content: `
+                    <p>Un athlète prépare un marathon. Son programme sur ${v.duree} semaines prévoit d'augmenter sa distance hebdomadaire de <strong>${v.increment} km</strong> chaque semaine.</p>
+                    <p>La première semaine, il court <strong>${v.depart} km</strong>.</p>
+                    <div class="math-block">
+                        \\(a_n = \\text{distance (km) parcourue la semaine } n\\)
+                    </div>
+                    <p><strong>Problème :</strong></p>
+                    <ol>
+                        <li>Modéliser par une suite arithmétique : donner \\(a_1\\) et la raison \\(r\\)</li>
+                        <li>Calculer la distance prévue pour la ${v.duree}ème semaine (\\(a_${v.duree}\\))</li>
+                        <li>Étudier le sens de variation de \\((a_n)\\)</li>
+                        <li><span style="color: #e11d48; font-weight: bold;">Critique :</span> Pourquoi ce modèle arithmétique n'est-il pas réaliste sur le long terme ? Que se passerait-il au bout de ${v.dureeCritique} semaines ?</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Modélisation</h4>
+                        <p>\\(a_{n+1} = a_n + ${v.increment}\\) avec \\(a_1 = ${v.depart}\\)</p>
+                        <p>Si on indexe à partir de 0 : \\(a_0 = ${v.depart}\\) et \\(a_n = a_0 + ${v.increment}n\\)</p>
+                        <p>Suite arithmétique de raison \\(r = ${v.increment} > 0\\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Calcul pour la ${v.duree}ème semaine</h4>
+                        <p>\\(a_{${v.duree}} = ${v.depart} + ${v.duree - 1} \\times ${v.increment} = ${v.depart} + ${(v.duree - 1) * v.increment} = \\mathbf{${v.final}}\\) km</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Sens de variation</h4>
+                        <p>\\(r = ${v.increment} > 0\\) : suite <strong>strictement croissante</strong> (progression constante).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>4. Critique du modèle</h4>
+                        <p>Au bout de ${v.dureeCritique} semaines : \\(a_{${v.dureeCritique}} = ${v.depart} + ${v.dureeCritique - 1} \\times ${v.increment} = ${v.depart} + ${(v.dureeCritique - 1) * v.increment} = ${v.critique}\\) km !</p>
+                        <p><strong>Limites :</strong></p>
+                        <ul>
+                            <li>Modèle linéaire indéfini dangereux pour la santé</li>
+                            <li>Risque de blessure (surentragement, fractures de stress)</li>
+                            <li>Capacités physiologiques limitées</li>
+                            <li>Un palier ou progression logarithmique serait plus réaliste</li>
+                        </ul>
+                        <p><em>Conclusion : Les suites arithmétiques modélisent bien les phénomènes à court terme, mais rarement les phénomènes biologiques sur le long terme.</em></p>
+                    </div>
+                `
+            }),
+            6: (v) => ({
+                category: "Comparaison de modèles",
+                title: "Vidange d'un réservoir",
+                content: `
+                    <p>Un réservoir contient <strong>${v.initial.toLocaleString()} L</strong> d'eau. On propose deux scénarios de vidange :</p>
+                    <div class="math-block">
+                        \\begin{cases}
+                        \\text{Scénario 1 :} & \\text{Retirer ${v.fixe} L par minute (modèle A)} \\\\
+                        \\text{Scénario 2 :} & \\text{Retirer ${v.pourcentage}% du volume restant par minute (modèle B)}
+                        \\end{cases}
+                    </div>
+                    <p><strong>Analyse comparée :</strong></p>
+                    <ol>
+                        <li>Pour chaque scénario, identifier si la suite, qui permet de modéliser la situation, est arithmétique et donner la relation de récurrence \\(u_{n+1} = f(u_n)\\)</li>
+                        <li>Calculer le volume après ${v.duree} minutes pour chaque scénario</li>
+                        <li>Déterminer au bout de combien de temps le réservoir est vide (ou quasi-vide) dans chaque cas</li>
+                        <li>Quel scénario vide plus vite au début ? Plus vite à la fin ? Justifier.</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Modèles mathématiques</h4>
+                        <p><strong>Scénario 1 :</strong> \\(u_{n+1} = u_n - ${v.fixe}\\) avec \\(u_0 = ${v.initial.toLocaleString()}\\)</p>
+                        <p>C'est une suite arithmétique de raison \\(r = -${v.fixe}\\).</p>
+                        <br>
+                        <p><strong>Scénario 2 :</strong> \\(v_{n+1} = v_n - ${v.pourcentage/100}v_n = ${1-v.pourcentage/100} \\times v_n\\) avec \\(v_0 = ${v.initial.toLocaleString()}\\)</p>
+                        <p>C'est une suite géométrique de raison \\(q = ${1-v.pourcentage/100}\\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Calculs après ${v.duree} minutes</h4>
+                        <p>Scénario 1 : \\(u_${v.duree} = ${v.initial.toLocaleString()} - ${v.duree} \\times ${v.fixe} = \\mathbf{${v.volFixe.toLocaleString()}}\\) L</p>
+                        <p>Scénario 2 : \\(v_${v.duree} = ${v.initial.toLocaleString()} \\times ${1-v.pourcentage/100}^${v.duree} \\approx \\mathbf{${v.volPct.toLocaleString()}}\\) L</p>
+                        <p><em>Au bout de ${v.duree} min, le scénario ${v.volFixe < v.volPct ? 1 : 2} a vidé plus (${Math.max(v.initial-v.volFixe, v.initial-v.volPct).toLocaleString()} L vs ${Math.min(v.initial-v.volFixe, v.initial-v.volPct).toLocaleString()} L).</em></p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Temps de vidange</h4>
+                        <p><strong>Scénario 1 :</strong> \\(${v.initial.toLocaleString()} - ${v.fixe}n = 0 \\Rightarrow n = ${Math.ceil(v.initial/v.fixe)}\\) minutes (vidange exacte et complète)</p>
+                        <p><strong>Scénario 2 :</strong> jamais exactement 0 (asymptote), mais on peut calculer quand il reste moins d'1L...</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>4. Analyse comparative</h4>
+                        <p><strong>Au début :</strong> Scénario 2 retire ${v.pourcentage}% de ${v.initial.toLocaleString()} = ${Math.round(v.initial*v.pourcentage/100)} L ${Math.round(v.initial*v.pourcentage/100) > v.fixe ? '>' : '<'} ${v.fixe} L</p>
+                        <p><strong>À la fin :</strong> Scénario 1 conserve son débit constant (${v.fixe} L/min) alors que le scénario 2 ralentit drastiquement (pourcentage d'un volume faible).</p>
+                    </div>
+                `
+            }),
+            7: (v) => {
+                // Exercice 7 avec répartition aléatoire 2 arithmétiques / 1 non
+                const [sitA, sitB, sitC] = v.situations;
+                
+                return {
+                    category: "Identification du modèle",
+                    title: "Modélisation possible ou non ?",
+                    content: `
+                        <p>Dans chacune des situations suivantes, déterminez si la situation peut être modélisée par une suite arithmétique. Justifiez votre réponse.</p>
+                        
+                        <div class="math-block">
+                            <strong>Situation A :</strong> ${sitA.texte} On note \\(u_n\\) le terme au rang \\(n\\).
+                        </div>
+                        
+                        <div class="math-block">
+                            <strong>Situation B :</strong> ${sitB.texte} On note \\(v_n\\) le terme au rang \\(n\\).
+                        </div>
+                        
+                        <div class="math-block">
+                            <strong>Situation C :</strong> ${sitC.texte} On note \\(w_n\\) le terme au rang \\(n\\).
+                        </div>
+                    `,
+                    solution: `
+                        <div class="solution-step">
+                            <h4>Situation A</h4>
+                            <p>Relation : $${sitA.relation}$</p>
+                            <p>${sitA.conclusion}</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>Situation B</h4>
+                            <p>Relation : $${sitB.relation}$</p>
+                            <p>${sitB.conclusion}</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>Situation C</h4>
+                            <p>Relation : $${sitC.relation}$</p>
+                            <p>${sitC.conclusion}</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>Bilan</h4>
+                            <p>${v.situations.filter(s => s.isArith).length} situation(s) sur 3 peu(vent) être modélisée(s) par une suite arithmétique.</p>
+                            <p>⚠️ <strong>Attention :</strong> Il est important de vérifier systématiquement si les accroissements sont constants avant de conclure !</p>
+                        </div>
+                    `
+                };
+            },
+            8: (v) => ({
+                category: "Calcul de termes",
+                title: "L'argent de poche de Léo",
+                content: `
+                    <p>Léo décide d'économiser pour s'acheter une console de jeux. Il dispose initialement de <strong>${v.initial} €</strong> dans sa tirelire (mois 0).</p>
+                    <p>Ses parents décident de lui donner <strong>${v.mensuel} €</strong> d'argent de poche chaque mois, qu'il ajoute intégralement à sa tirelire.</p>
+                    <div class="math-block">
+                        \\(u_n = \\text{montant total dans la tirelire au bout de } n \\text{ mois}\\)
+                    </div>
+                    <p><strong>Questions :</strong></p>
+                    <ol>
+                        <li>Précisez le premier terme \\(u_0\\) de la suite.</li>
+                        <li>Exprimez le montant \\(u_{n+1}\\) en fonction du montant \\(u_n\\) du mois précédent. Quelle est la nature de la suite \\((u_n)\\) ? Précisez sa raison.</li>
+                        <li>Déterminez le sens de variation de la suite \\((u_n)\\). Justifiez.</li>
+                        <li>Calculez, pas à pas, le montant dont disposera Léo au bout de ${v.mois} mois (\\(u_${v.mois}\\)).</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Premier terme</h4>
+                        <p>\\(u_0 = ${v.initial}\\) € (montant initial)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Nature de la suite</h4>
+                        <p>Relation de récurrence : \\[u_{n+1} = u_n + ${v.mensuel}\\]</p>
+                        <p><strong>C'est une suite arithmétique</strong> de raison \\(r = ${v.mensuel}\\).</p>
+                        <p>Chaque mois, on ajoute la même somme (${v.mensuel} €).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Sens de variation</h4>
+                        <p>La raison \\(r = ${v.mensuel} > 0\\), donc la suite est <strong>strictement croissante</strong>.</p>
+                        <p>L'épargne de Léo augmente régulièrement chaque mois.</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>4. Calcul pas à pas jusqu'à \\(u_${v.mois}\\)</h4>
+                        <ul>
+                            <li>\\(u_0 = ${v.initial}\\) €</li>
+                            <li>\\(u_1 = ${v.initial} + ${v.mensuel} = ${v.initial + v.mensuel}\\) €</li>
+                            <li>\\(u_2 = ${v.initial + v.mensuel} + ${v.mensuel} = ${v.initial + 2*v.mensuel}\\) €</li>
+                            <li>\\(u_3 = ${v.initial + 2*v.mensuel} + ${v.mensuel} = ${v.initial + 3*v.mensuel}\\) €</li>
+                            <li>\\(u_4 = ${v.initial + 3*v.mensuel} + ${v.mensuel} = \\mathbf{${v.final}}\\) €</li>
+                        </ul>
+                        <p>Au bout de ${v.mois} mois, Léo disposera de ${v.final} €.</p>
+                    </div>
+                `
+            }),
+            9: (v) => ({
+                category: "Comparaison et limites",
+                title: "Location de matériel",
+                content: `
+                    <p>Une entreprise propose deux tarifs pour la location d'une photocopieuse. On s'intéresse à l'évolution du nombre de copies mensuelles.</p>
+                    <p>Un client imprime <strong>${v.initial} copies</strong> le premier mois, puis augmente sa consommation de <strong>${v.increment} copies</strong> chaque mois suivant.</p>
+                    <div class="math-block">
+                        \\((c_n) = \\text{nombre de copies imprimées le mois } n \\quad \\text{avec} \\quad c_0 = ${v.initial}\\)
+                    </div>
+                    <p><strong>Questions :</strong></p>
+                    <ol>
+                        <li>Justifiez que la suite \\((c_n)\\) modélisant le nombre de copies est arithmétique. Donnez sa raison.</li>
+                        <li>Calculez le nombre de copies prévues pour le mois \\(n=3\\).</li>
+                        <li><em>Question ouverte :</em> Si la capacité maximale de la photocopieuse est de ${v.max.toLocaleString()} copies par mois, la modélisation par cette suite arithmétique est-elle valable indéfiniment ? Expliquez.</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Nature de la suite</h4>
+                        <p>Chaque mois, on ajoute ${v.increment} copies : \\[c_{n+1} = c_n + ${v.increment}\\]</p>
+                        <p>Avec \\(c_0 = ${v.initial}\\).</p>
+                        <p><strong>C'est une suite arithmétique</strong> de raison \\(r = ${v.increment}\\) (strictement croissante).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Calcul pour le mois \\(n=3\\)</h4>
+                        <ul>
+                            <li>\\(c_0 = ${v.initial}\\)</li>
+                            <li>\\(c_1 = ${v.initial} + ${v.increment} = ${v.initial + v.increment}\\)</li>
+                            <li>\\(c_2 = ${v.initial + v.increment} + ${v.increment} = ${v.initial + 2*v.increment}\\)</li>
+                            <li>\\(c_3 = ${v.initial + 2*v.increment} + ${v.increment} = \\mathbf{${v.initial + 3*v.increment}}\\) copies</li>
+                        </ul>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Validité du modèle</h4>
+                        <p><strong>Non, la modélisation n'est pas valable indéfiniment.</strong></p>
+                        <p>On cherche \\(n\\) tel que \\(c_n > ${v.max.toLocaleString()}\\) :</p>
+                        <p>\\(${v.initial} + ${v.increment}n > ${v.max.toLocaleString()}\\)</p>
+                        <p>\\(${v.increment}n > ${v.max - v.initial}\\)</p>
+                        <p>\\(n > ${Math.floor((v.max - v.initial)/v.increment)}\\)</p>
+                        <p>Au bout de ${v.limite} mois (environ ${Math.floor(v.limite/12)} ans), la suite prévoit plus de ${v.max.toLocaleString()} copies, ce qui dépasse la capacité maximale. Le modèle arithmétique n'est valable que tant que \\(c_n \\leq ${v.max.toLocaleString()}\\).</p>
+                    </div>
+                `
+            }),
+            10: (v) => ({
+                category: "Problème ouvert",
+                title: "Empilement de cubes",
+                content: `
+                    <p>Un enfant construit une tour avec des cubes selon une logique arithmétique :</p>
+                    <ul>
+                        <li>Rangée 1 (bas) : <strong>${v.debut} cubes</strong></li>
+                        <li>Rangée 2 : <strong>${v.debut - v.raison} cubes</strong></li>
+                        <li>Rangée 3 : <strong>${v.debut - 2*v.raison} cubes</strong></li>
+                        <li>Et ainsi de suite...</li>
+                    </ul>
+                    <div class="math-block">
+                        \\((u_n) = \\text{nombre de cubes sur la } n\\text{-ème rangée}\\)
+                    </div>
+                    <p><strong>Problème :</strong></p>
+                    <ol>
+                        <li>Modélisez cette situation à l'aide d'une suite \\((u_n)\\) en précisant ce que représente \\(n\\) et \\(u_n\\), et donnez la relation de récurrence liant \\(u_{n+1}\\) et \\(u_n\\).</li>
+                        <li>Combien de cubes contiendra la 6ème rangée ?</li>
+                        <li>L'enfant pourra-t-il construire une 10ème rangée selon cette règle ? Justifiez votre réponse sans nécessairement faire tous les calculs intermédiaires, mais en utilisant le sens de variation de la suite.</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Modélisation</h4>
+                        <p>\\(n\\) représente le numéro de la rangée (en partant du bas).</p>
+                        <p>\\(u_n\\) représente le nombre de cubes sur la \\(n\\)-ème rangée.</p>
+                        <p>Relation de récurrence : \\[u_{n+1} = u_n - ${v.raison}\\]</p>
+                        <p>Avec \\(u_1 = ${v.debut}\\) (ou \\(u_0 = ${v.debut}\\) si on indexe à partir de 0).</p>
+                        <p><strong>C'est une suite arithmétique</strong> de raison \\(r = -${v.raison}\\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Calcul pour la 6ème rangée</h4>
+                        <p>En partant de \\(u_1 = ${v.debut}\\) :</p>
+                        <ul>
+                            <li>\\(u_2 = ${v.debut - v.raison}\\)</li>
+                            <li>\\(u_3 = ${v.debut - 2*v.raison}\\)</li>
+                            <li>\\(u_4 = ${v.debut - 3*v.raison}\\)</li>
+                            <li>\\(u_5 = ${v.debut - 4*v.raison}\\)</li>
+                            <li>\\(u_6 = \\mathbf{${v.rangee6}}\\) cubes</li>
+                        </ul>
+                        <p>Ou directement : \\(u_6 = ${v.debut} + 5 \\times (-${v.raison}) = ${v.rangee6}\\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Possibilité de la 10ème rangée</h4>
+                        <p>La raison \\(r = -${v.raison} < 0\\), donc la suite est <strong>strictement décroissante</strong>.</p>
+                        <p>Calcul pour la 10ème rangée : \\(u_{10} = ${v.debut} + 9 \\times (-${v.raison}) = ${v.debut} - ${9*v.raison} = ${v.rangee10}\\)</p>
+                        <p><strong>Conclusion :</strong> Il est ${v.rangee10 > 0 ? 'possible' : 'impossible'} de construire une 10ème rangée${v.rangee10 <= 0 ? ' car cela nécessiterait un nombre négatif ou nul de cubes' : ''}.</p>
+                        ${v.limite < 10 ? `<p>En réalité, l'enfant s'arrêtera avant : dès que \\(u_n \\leq 0\\), on ne peut plus poser de cubes. La dernière rangée possible est la ${v.limite}ème (${v.debut - (v.limite-1)*v.raison} cube${v.debut - (v.limite-1)*v.raison > 1 ? 's' : ''}).</p>` : ''}
+                    </div>
+                `
+            }),
+            11: (v) => ({
+                category: "Détermination des paramètres",
+                title: "Trouver la raison et le premier terme",
+                content: `
+                    <p>On sait que le nombre de clients mensuels d'une salle de sport, noté \\(u_n\\) au mois \\(n\\), évolue selon une suite arithmétique.</p>
+                    <p>On relève les données suivantes issues des statistiques :</p>
+                    <div class="math-block">
+                        \\begin{cases}
+                        u_{${v.idx1}} = ${v.uIdx1} \\text{ clients} \\\\
+                        u_{${v.idx2}} = ${v.uIdx2} \\text{ clients}
+                        \\end{cases}
+                    </div>
+                    <p><strong>Problème :</strong></p>
+                    <ol>
+                        <li>Déterminer la raison \\(r\\) de cette suite.</li>
+                        <li>Calculer \\(u_0\\) (le nombre de clients au mois 0/initial).</li>
+                        <li>Exprimer la relation de récurrence complète de la suite.</li>
+                        <li>Combien de clients y aura-t-il au mois ${v.idx3} ?</li>
+                    </ol>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Calcul de la raison r</h4>
+                        <p>On utilise la propriété des suites arithmétiques : \\(u_p = u_q + (p-q)r\\)</p>
+                        <p>Avec \\(p = ${v.idx2}\\) et \\(q = ${v.idx1}\\) :</p>
+                        <p>\\[u_${v.idx2} = u_${v.idx1} + (${v.idx2}-${v.idx1})r\\]</p>
+                        <p>\\[${v.uIdx2} = ${v.uIdx1} + ${v.idx2-v.idx1}r\\]</p>
+                        <p>\\[${v.idx2-v.idx1}r = ${v.uIdx2 - v.uIdx1}\\]</p>
+                        <p>\\[\\mathbf{r = ${v.r}}\\]</p>
+                        <p>La raison est ${v.r} (augmentation de ${v.r} clients par mois).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Calcul de u_0</h4>
+                        <p>On utilise \\(u_${v.idx1} = u_0 + ${v.idx1}r\\) :</p>
+                        <p>\\[${v.uIdx1} = u_0 + ${v.idx1} \\times ${v.r}\\]</p>
+                        <p>\\[${v.uIdx1} = u_0 + ${v.idx1 * v.r}\\]</p>
+                        <p>\\[\\mathbf{u_0 = ${v.u0}}\\]</p>
+                        <p>Il y avait ${v.u0} clients au départ (mois 0).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>3. Relation de récurrence</h4>
+                        <p>\\[u_{n+1} = u_n + ${v.r} \\quad \\text{avec} \\quad u_0 = ${v.u0}\\]</p>
+                        <p>Ou si on indexe à partir de 1 : \\(u_{n+1} = u_n + ${v.r}\\) avec \\(u_1 = ${v.u0 + v.r}\\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>4. Nombre de clients au mois ${v.idx3}</h4>
+                        <p>\\(u_${v.idx3} = u_${v.idx2} + (${v.idx3}-${v.idx2})r = ${v.uIdx2} + ${v.idx3-v.idx2} \\times ${v.r} = ${v.uIdx2} + ${(v.idx3-v.idx2)*v.r} = \\mathbf{${v.uIdx3}}\\) clients</p>
+                        <p>Ou avec \\(u_0\\) : \\(u_${v.idx3} = u_0 + ${v.idx3}r = ${v.u0} + ${v.idx3 * v.r} = ${v.uIdx3}\\) clients.</p>
+                    </div>
+                `
+            }),
+            12: (v) => {
+                // Génération des points SVG dynamiquement
+                const pointsSVG = v.heights.map(h => `
+                    <circle cx="${h.x}" cy="${h.y}" r="6" fill="#2563eb" stroke="white" stroke-width="2"/>
+                    <text x="${h.x}" y="${h.y - 15}" text-anchor="middle" font-size="11" fill="#2563eb">${h.label}(${h.week}; ${h.height})</text>
+                `).join('');
+                
+                // Détermination des ticks Y basés sur les valeurs max
+                const maxVal = Math.max(...v.heights.map(h => h.height));
+                const yMax = Math.ceil(maxVal / 5) * 5 + 5; // Arrondir au multiple de 5 supérieur + marge
+                
+                const getYPos = (val) => 250 - (val / yMax) * 200; // 200 = hauteur utile du graphique
+                
+                // Générer les ticks Y
+                let ticksY = '';
+                for (let i = 0; i <= 4; i++) {
+                    const val = Math.round((yMax / 4) * i);
+                    const yPos = getYPos(val);
+                    ticksY += `
+                        <line x1="45" y1="${yPos}" x2="50" y2="${yPos}" stroke="#1e293b" stroke-width="2"/>
+                        <text x="40" y="${yPos + 5}" text-anchor="end" font-size="12">${val}</text>
+                    `;
+                }
+                
+                // Recalculer les positions Y des points avec la bonne échelle
+                const pointsWithCorrectY = v.heights.map(h => ({
+                    ...h,
+                    y: getYPos(h.height)
+                }));
+                
+                const pointsSVGCorrect = pointsWithCorrectY.map(h => `
+                    <circle cx="${h.x}" cy="${h.y}" r="6" fill="#2563eb" stroke="white" stroke-width="2"/>
+                    <text x="${h.x}" y="${h.y - 15}" text-anchor="middle" font-size="11" fill="#2563eb">${h.label}(${h.week}; ${h.height})</text>
+                `).join('');
+                
+                // Texte d'introduction adapté au type
+                let introText = '';
+                if (v.type === 'aligned') {
+                    introText = 'Les points semblent parfaitement alignés sur une droite.';
+                } else if (v.type === 'almost') {
+                    introText = 'Les points semblent presque alignés, avec de légères variations.';
+                } else {
+                    introText = 'Les points ne semblent pas alignés sur une droite.';
+                }
+                
+                // Solution adaptée au type
+                let solutionContent = '';
+                if (v.type === 'aligned') {
+                    solutionContent = `
+                        <div class="solution-step">
+                            <h4>1. Observation graphique</h4>
+                            <p>${introText}</p>
+                            <p><strong>Conjecture :</strong> On peut modéliser cette croissance par une suite arithmétique.</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>2. Vérification des différences</h4>
+                            <p>Données : ${v.heights.map(h => `\\(h_${h.week} = ${h.height}\\)`).join(', ')}</p>
+                            <ul>
+                                ${v.diffs.map((d, i) => `<li>\\(h_${i+1} - h_${i} = ${v.heights[i+1].height} - ${v.heights[i].height} = ${d}\\)</li>`).join('')}
+                            </ul>
+                            <p>Les différences sont constantes et égales à <strong>${v.diffs[0]} cm par semaine</strong>.</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>3. Relation de récurrence</h4>
+                            <p>Suite arithmétique : \\[h_{n+1} = h_n + ${v.diffs[0]}\\] avec \\(h_0 = ${v.h0}\\) et \\(r = ${v.diffs[0]}\\).</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>4. Prévision au bout de ${v.targetWeek} semaines</h4>
+                            <p>\\(h_${v.targetWeek} = ${v.h0} + ${v.targetWeek} \\times ${v.diffs[0]} = \\mathbf{${v.finalHeight}}\\) cm</p>
+                        </div>
+                    `;
+                } else if (v.type === 'almost') {
+                    // Calcul de la moyenne des différences
+                    const avgDiff = Math.round(v.diffs.reduce((a,b) => a+b, 0) / v.diffs.length);
+                    solutionContent = `
+                        <div class="solution-step">
+                            <h4>1. Observation graphique</h4>
+                            <p>${introText}</p>
+                            <p><strong>Conjecture :</strong> La croissance est approximativement linéaire (suite arithmétique).</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>2. Vérification des différences</h4>
+                            <p>Données : ${v.heights.map(h => `\\(h_${h.week} = ${h.height}\\)`).join(', ')}</p>
+                            <ul>
+                                ${v.diffs.map((d, i) => `<li>\\(h_${i+1} - h_${i} = ${d}\\)</li>`).join('')}
+                            </ul>
+                            <p>Les différences sont <em>approximativement</em> constantes (autour de ${avgDiff} cm).</p>
+                            <p>Les petites variations peuvent s'expliquer par des erreurs de mesure ou des conditions environnementales.</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>3. Modélisation approchée</h4>
+                            <p>On peut modéliser par une suite arithmétique : \\[h_{n+1} \\approx h_n + ${avgDiff}\\] avec \\(h_0 = ${v.h0}\\).</p>
+                            <p>C'est une <strong>approximation</strong> acceptable pour faire des prévisions.</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>4. Prévision au bout de ${v.targetWeek} semaines</h4>
+                            <p>\\(h_${v.targetWeek} \\approx ${v.h0} + ${v.targetWeek} \\times ${avgDiff} \\approx \\mathbf{${v.h0 + v.targetWeek * avgDiff}}\\) cm</p>
+                            <p>⚠️ Cette prévision comporte une marge d'erreur due aux fluctuations observées.</p>
+                        </div>
+                    `;
+                } else {
+                    // Non alignés
+                    solutionContent = `
+                        <div class="solution-step">
+                            <h4>1. Observation graphique</h4>
+                            <p>${introText}</p>
+                            <p><strong>Conjecture :</strong> Ce n'est probablement pas une suite arithmétique.</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>2. Vérification des différences</h4>
+                            <p>Données : ${v.heights.map(h => `\\(h_${h.week} = ${h.height}\\)`).join(', ')}</p>
+                            <ul>
+                                ${v.diffs.map((d, i) => `<li>\\(h_${i+1} - h_${i} = ${d}\\)</li>`).join('')}
+                            </ul>
+                            <p>Les différences ne sont <strong>pas constantes</strong> : ${v.diffs.join(', ')}.</p>
+                            <p>La croissance n'est donc pas linéaire.</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>3. Nature de la suite</h4>
+                            <p><strong>Ce n'est pas une suite arithmétique.</strong></p>
+                            <p>On observe une croissance irrégulière (accélérations et ralentissements alternés).</p>
+                            <p>Un autre modèle (géométrique, logarithmique ou polynomial) serait plus approprié.</p>
+                        </div>
+                        <div class="solution-step">
+                            <h4>4. Prévision</h4>
+                            <p>Il est <strong>impossible de faire une prévision fiable</strong> au bout de ${v.targetWeek} semaines avec un modèle arithmétique, car le modèle ne correspond pas à la réalité observée.</p>
+                            <p>Il faudrait identifier le véritable type de croissance avant de pouvoir extrapoler.</p>
+                        </div>
+                    `;
+                }
+                
+                return {
+                    category: "Lecture graphique",
+                    title: "Modélisation à partir d'un graphique",
+                    content: `
+                        <p>Un botaniste étudie la croissance d'une jeune pousse de maïs. Il relève la hauteur de la plante chaque semaine.</p>
+                        <p>Le nuage de points ci-dessous représente les mesures effectuées sur les 6 premières semaines :</p>
+                        
+                        <div class="graph-container">
+                            <svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Grid -->
+                                <defs>
+                                    <pattern id="grid" width="50" height="30" patternUnits="userSpaceOnUse">
+                                        <path d="M 50 0 L 0 0 0 30" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+                                    </pattern>
+                                </defs>
+                                <rect width="500" height="300" fill="url(#grid)" />
+                                
+                                <!-- Axes -->
+                                <line x1="50" y1="250" x2="450" y2="250" stroke="#1e293b" stroke-width="2" />
+                                <line x1="50" y1="250" x2="50" y2="30" stroke="#1e293b" stroke-width="2" />
+                                
+                                <!-- Axis labels -->
+                                <text x="250" y="280" text-anchor="middle" font-size="14" fill="#1e293b">Numéro de la semaine (n)</text>
+                                <text x="20" y="150" text-anchor="middle" font-size="14" fill="#1e293b" transform="rotate(-90, 20, 150)">Hauteur (cm)</text>
+                                
+                                <!-- Ticks X -->
+                                <line x1="50" y1="250" x2="50" y2="255" stroke="#1e293b" stroke-width="2"/>
+                                <text x="50" y="270" text-anchor="middle" font-size="12">0</text>
+                                <line x1="130" y1="250" x2="130" y2="255" stroke="#1e293b" stroke-width="2"/>
+                                <text x="130" y="270" text-anchor="middle" font-size="12">1</text>
+                                <line x1="210" y1="250" x2="210" y2="255" stroke="#1e293b" stroke-width="2"/>
+                                <text x="210" y="270" text-anchor="middle" font-size="12">2</text>
+                                <line x1="290" y1="250" x2="290" y2="255" stroke="#1e293b" stroke-width="2"/>
+                                <text x="290" y="270" text-anchor="middle" font-size="12">3</text>
+                                <line x1="370" y1="250" x2="370" y2="255" stroke="#1e293b" stroke-width="2"/>
+                                <text x="370" y="270" text-anchor="middle" font-size="12">4</text>
+                                <line x1="450" y1="250" x2="450" y2="255" stroke="#1e293b" stroke-width="2"/>
+                                <text x="450" y="270" text-anchor="middle" font-size="12">5</text>
+                                
+                                <!-- Ticks Y dynamiques -->
+                                ${ticksY}
+                                
+                                <!-- Points dynamiques -->
+                                ${pointsSVGCorrect}
+                            </svg>
+                        </div>
+                        <p><strong>Questions d'analyse :</strong></p>
+                        <ol>
+                            <li>En observant le nuage de points, les points semblent-ils alignés ? Que peut-on conjecturer sur la nature de la suite modélisant cette croissance ?</li>
+                            <li>Calculer les différences de hauteur entre chaque semaine consécutive : \\(h_1-h_0\\), \\(h_2-h_1\\), etc. Ces différences sont-elles constantes ?</li>
+                            <li>${v.type === 'not_aligned' ? 'Expliquer pourquoi il est impossible de modéliser par une suite arithmétique.' : 'Déterminer la relation de récurrence de la suite \\((h_n)\\) où \\(h_n\\) est la hauteur au bout de \\(n\\) semaines. Préciser \\(h_0\\) et \\(r\\).'}</li>
+                            <li>${v.type === 'not_aligned' ? 'Pourquoi est-il hasardeux de prédire la hauteur au bout de 8 semaines ?' : `Selon ce modèle, quelle sera la hauteur de la plante au bout de ${v.targetWeek} semaines ? Ce modèle vous paraît-il réaliste sur le très long terme ?`}</li>
+                        </ol>
+                    `,
+                    solution: solutionContent
+                };
+            }
+        };
+
+        function generateExerciseData(id) {
+            if (generators[id]) {
+                return generators[id]();
+            }
+            return {};
+        }
+
+        function init() {
+            // Générer toutes les valeurs aléatoires initiales
+            for (let i = 1; i <= 12; i++) {
+                currentValues[i] = generateExerciseData(i);
+            }
+            renderSidebar();
+            loadExercise(0);
+        }
+
+        function regenerateAll() {
+            // Régénérer toutes les valeurs
+            for (let i = 1; i <= 12; i++) {
+                currentValues[i] = generateExerciseData(i);
+            }
+            // Recharger l'exercice actuel avec animation
+            const slide = document.getElementById('currentSlide');
+            slide.style.animation = 'none';
+            setTimeout(() => {
+                loadExercise(currentExercise);
+                // Feedback visuel
+                const indicator = document.getElementById('randomIndicator');
+                indicator.style.transform = 'scale(1.2)';
+                indicator.style.background = 'rgba(16, 185, 129, 0.2)';
+                indicator.style.borderColor = 'var(--success)';
+                indicator.innerHTML = '✅ Nouvelles valeurs générées !';
+                setTimeout(() => {
+                    indicator.style.transform = 'scale(1)';
+                    indicator.style.background = 'rgba(245, 158, 11, 0.1)';
+                    indicator.style.borderColor = 'var(--accent)';
+                    indicator.innerHTML = '🎲 Valeurs aléatoires actives';
+                }, 1000);
+            }, 50);
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById('exerciseList');
+            const titles = [
+                "Évolution d'une population de bactéries",
+                "Dépréciation linéaire d'une machine",
+                "Échelonnement de dette",
+                "Température et altitude",
+                "Training sportif et limites du modèle",
+                "Vidange d'un réservoir",
+                "Modélisation possible ou non ?",
+                "L'argent de poche de Léo",
+                "Location de matériel",
+                "Empilement de cubes",
+                "Trouver la raison et le premier terme",
+                "Modélisation à partir d'un graphique"
+            ];
+            
+            list.innerHTML = titles.map((title, idx) => `
+                <div class="exercise-item ${idx === 0 ? 'active' : ''}" onclick="loadExercise(${idx})" title="${title}">
+                    <span class="exercise-number">Ex ${idx + 1}</span>
+                    <div style="font-weight: 600; margin-bottom: 4px;">${exerciseTemplates[idx+1](currentValues[idx+1]).category}</div>
+                    <div style="opacity: 0.8; font-size: 0.85rem;">${title}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadExercise(index) {
+            currentExercise = index;
+            const exId = index + 1;
+            const values = currentValues[exId];
+            const ex = exerciseTemplates[exId](values);
+            const slide = document.getElementById('currentSlide');
+            
+            document.querySelectorAll('.exercise-item').forEach((el, idx) => {
+                el.classList.toggle('active', idx === index);
+            });
+            
+            slide.scrollTop = 0;
+            
+            slide.style.animation = 'none';
+            setTimeout(() => {
+                slide.innerHTML = `
+                    <div class="slide-header">
+                        <span class="slide-category">${ex.category}</span>
+                        <h2>${ex.title}</h2>
+                    </div>
+                    <div class="slide-content">
+                        ${ex.content}
+                    </div>
+                `;
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([slide]);
+                }
+                
+                slide.style.animation = 'fadeIn 0.4s ease';
+                
+                document.getElementById('btnPrev').disabled = (index === 0);
+                document.getElementById('btnNext').disabled = (index === 11);
+                document.getElementById('btnPrev').style.opacity = (index === 0) ? '0.5' : '1';
+                document.getElementById('btnNext').style.opacity = (index === 11) ? '0.5' : '1';
+            }, 50);
+        }
+
+        function nextExercise() {
+            if (currentExercise < 11) {
+                loadExercise(currentExercise + 1);
+            }
+        }
+
+        function prevExercise() {
+            if (currentExercise > 0) {
+                loadExercise(currentExercise - 1);
+            }
+        }
+
+        function openSolution() {
+            const exId = currentExercise + 1;
+            const values = currentValues[exId];
+            const ex = exerciseTemplates[exId](values);
+            document.getElementById('solutionContent').innerHTML = ex.solution;
+            document.getElementById('solutionModal').classList.add('active');
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise([document.getElementById('solutionContent')]);
+            }
+        }
+
+        function openCopyright() {
+            document.getElementById('copyrightModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextExercise();
+            if (e.key === 'ArrowLeft') prevExercise();
+            if (e.key === 'Escape') {
+                closeModal('solutionModal');
+                closeModal('copyrightModal');
+            }
+        });
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
