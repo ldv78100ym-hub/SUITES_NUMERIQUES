@@ -23,7 +23,7 @@
             --primary-color: #2c3e50;
             --accent-color: #3498db;
             --success-color: #27ae60;
-            --warning-color: #e67e22; /* Orange pour les solutions */
+            --warning-color: #e67e22;
             --bg-color: #f4f6f7;
             --text-color: #333;
             --box-bg: #ffffff;
@@ -56,7 +56,6 @@
         .card.problem { border-left-color: #d35400; }
         .card.exercise { border-left-color: #27ae60; border: 2px solid #27ae60; }
 
-        /* Boutons */
         .btn-container { text-align: center; margin: 20px 0; display: flex; justify-content: center; gap: 15px; }
         
         button {
@@ -71,7 +70,6 @@
         .btn-refresh { background-color: var(--primary-color); color: white; }
         .btn-refresh:hover { background-color: #34495e; }
 
-        /* Bouton Spécifique Solution */
         .btn-show-sol {
             background-color: var(--warning-color);
             color: white;
@@ -82,9 +80,8 @@
         }
         .btn-show-sol:hover { background-color: #d35400; }
 
-        /* Zone de solution cachée par défaut */
         .solution-box {
-            display: none; /* CACHÉ PAR DÉFAUT */
+            display: none;
             background-color: #e8f6f3;
             padding: 15px;
             border-radius: 5px;
@@ -101,7 +98,58 @@
         
         canvas { background: #fff; border: 1px solid #ccc; display: block; margin: 10px auto; max-width: 100%; }
 
-        /* Modal */
+        .step-calc { 
+            background: #fff3cd; 
+            padding: 10px; 
+            border-left: 4px solid #ffc107; 
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .schema-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin: 0 5px;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .term-box {
+            display: inline-block;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 5px 10px;
+            margin: 2px;
+            min-width: 40px;
+        }
+
+        .jump-label {
+            color: #d32f2f;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .suite-type-badge {
+            display: inline-block;
+            background: #ffebee;
+            color: #c62828;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+            border: 1px solid #ef9a9a;
+        }
+
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px; }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
@@ -136,7 +184,7 @@
     </div>
 
     <div class="card">
-        <h2>4. Prouver qu'une suite n'est PAS arithmétique</h2>
+        <h2>4. Prouver qu'une suite n'est PAS arithmétique <span id="suite-type-label" class="suite-type-badge"></span></h2>
         <div id="ex-counter"></div>
     </div>
 
@@ -146,8 +194,8 @@
     </div>
 
     <div class="card exercise">
-        <h2 style="color:#27ae60;">6. Exercices d'Entraînement Rapide</h2>
-        <p>À vous de jouer ! Prenez une feuille, faites le calcul, puis vérifiez.</p>
+        <h2 style="color:#27ae60;">6. Exercices d'Entraînement Rapide (Méthode Pas-à-Pas)</h2>
+        <p>Calculez terme par terme, puis observez le schéma récapitulatif.</p>
         <hr style="border:0; border-top:1px dashed #ccc;">
         <div id="drill-exercises"></div>
     </div>
@@ -164,15 +212,9 @@
 </div>
 
 <script>
-    /**
-     * Outils
-     */
     function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
     function formatSignedNumber(n) { return n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`; }
 
-    /**
-     * Fonction Principale : AFFICHER / MASQUER SOLUTION
-     */
     function toggleSol(id) {
         let box = document.getElementById('sol-' + id);
         let btn = document.getElementById('btn-' + id);
@@ -180,29 +222,25 @@
         if (box.style.display === "none" || box.style.display === "") {
             box.style.display = "block";
             btn.innerHTML = "🙈 Masquer la solution";
-            btn.style.backgroundColor = "#7f8c8d"; // Devient gris
+            btn.style.backgroundColor = "#7f8c8d";
         } else {
             box.style.display = "none";
             btn.innerHTML = "👁️ Voir la solution";
-            btn.style.backgroundColor = "#e67e22"; // Revient orange
+            btn.style.backgroundColor = "#e67e22";
         }
     }
 
-    /**
-     * Génération du contenu
-     */
     function generateContent() {
         generateRecurrence();
         generateExplicit(); 
         generateCounterExample();
         generateGraph();
         generatePBL();
-        generateDrills(); // Les exos supplémentaires
+        generateDrills();
         
         if (window.MathJax) { MathJax.typesetPromise(); }
     }
 
-    /* 1. Recurrence */
     function generateRecurrence() {
         let u0 = getRandomInt(-20, 20);
         let r = getRandomInt(-10, 10);
@@ -221,7 +259,6 @@
         document.getElementById('ex-recurrence').innerHTML = html;
     }
 
-    /* 2. Explicit */
     function generateExplicit() {
         let a = getRandomInt(-10, 10);
         while (a === 0) a = 3;
@@ -242,7 +279,6 @@
         document.getElementById('ex-explicit').innerHTML = html;
     }
 
-    /* 3. Graphique (Pas de solution à cacher ici, c'est visuel) */
     function generateGraph() {
         let canvas = document.getElementById('canvasGraph');
         let ctx = canvas.getContext('2d');
@@ -279,93 +315,334 @@
             let px = margin + n * scaleX;
             let py = canvas.height - margin - (un - minY) * scaleY;
             ctx.beginPath(); ctx.arc(px, py, 6, 0, 2 * Math.PI); ctx.fill();
-            ctx.fillStyle = '#000'; ctx.font = '12px Arial'; ctx.fillText(`u${n}`, px + 5, py - 10); ctx.fillStyle = '#e74c3c';
+            ctx.fillStyle = '#000'; ctx.font = '12px Arial'; 
+            ctx.fillText('u' + n, px + 5, py - 10); 
+            ctx.fillStyle = '#e74c3c';
         }
     }
 
-    /* 4. Contre-exemple */
+    /* Exercice 4 VARIÉ avec différents types de suites non arithmétiques */
     function generateCounterExample() {
-        let c = getRandomInt(-10, 10);
-        let html = `
-            <p>Soit \\( u_n = n^2 ${formatSignedNumber(c)} \\).</p>
-            <p><strong>Question :</strong> Est-ce une suite arithmétique ? Justifiez.</p>
-            
-            <button id="btn-count" class="btn-show-sol" onclick="toggleSol('count')">👁️ Voir la solution</button>
-            <div id="sol-count" class="solution-box">
-                <p>Calculons les premiers termes :</p>
-                <ul>
-                    <li>\\( u_0 = 0^2 ${formatSignedNumber(c)} = ${c} \\)</li>
-                    <li>\\( u_1 = 1^2 ${formatSignedNumber(c)} = ${1+c} \\) (écart = +1)</li>
-                    <li>\\( u_2 = 2^2 ${formatSignedNumber(c)} = ${4+c} \\) (écart = +3)</li>
-                </ul>
-                <p>L'écart n'est pas constant ($1 \\neq 3$). Ce n'est <strong>PAS</strong> une suite arithmétique.</p>
-            </div>
-        `;
+        let type = getRandomInt(0, 4); // 5 types différents
+        let c = getRandomInt(-5, 5);
+        let k = getRandomInt(2, 4);
+        let html = "";
+        let label = "";
+        
+        switch(type) {
+            case 0: // Quadratique : n² + c
+                label = "Quadratique";
+                let u0_q = c;
+                let u1_q = 1 + c;
+                let u2_q = 4 + c;
+                let diff1_q = u1_q - u0_q;
+                let diff2_q = u2_q - u1_q;
+                
+                html = `
+                    <p>Soit \\( u_n = n^2 ${formatSignedNumber(c)} \\).</p>
+                    <p><strong>Question :</strong> Est-ce une suite arithmétique ? Justifiez.</p>
+                    
+                    <button id="btn-count" class="btn-show-sol" onclick="toggleSol('count')">👁️ Voir la solution</button>
+                    <div id="sol-count" class="solution-box">
+                        <p>Calculons les premiers termes :</p>
+                        <ul>
+                            <li>\\( u_0 = 0^2 ${formatSignedNumber(c)} = ${u0_q} \\)</li>
+                            <li>\\( u_1 = 1^2 ${formatSignedNumber(c)} = ${u1_q} \\) (écart = ${diff1_q > 0 ? '+' : ''}${diff1_q})</li>
+                            <li>\\( u_2 = 2^2 ${formatSignedNumber(c)} = ${u2_q} \\) (écart = ${diff2_q > 0 ? '+' : ''}${diff2_q})</li>
+                        </ul>
+                        <p>Les écarts ne sont pas constants (\\(${diff1_q} \\neq ${diff2_q}\\)).<br>
+                        Ce n'est <strong>PAS</strong> une suite arithmétique (c'est une suite quadratique).</p>
+                    </div>
+                `;
+                break;
+                
+            case 1: // Cubique : n³ + c
+                label = "Cubique";
+                let u0_c = c;
+                let u1_c = 1 + c;
+                let u2_c = 8 + c;
+                let diff1_c = u1_c - u0_c;
+                let diff2_c = u2_c - u1_c;
+                
+                html = `
+                    <p>Soit \\( u_n = n^3 ${formatSignedNumber(c)} \\).</p>
+                    <p><strong>Question :</strong> Est-ce une suite arithmétique ? Justifiez.</p>
+                    
+                    <button id="btn-count" class="btn-show-sol" onclick="toggleSol('count')">👁️ Voir la solution</button>
+                    <div id="sol-count" class="solution-box">
+                        <p>Calculons les premiers termes :</p>
+                        <ul>
+                            <li>\\( u_0 = 0^3 ${formatSignedNumber(c)} = ${u0_c} \\)</li>
+                            <li>\\( u_1 = 1^3 ${formatSignedNumber(c)} = ${u1_c} \\) (écart = ${diff1_c > 0 ? '+' : ''}${diff1_c})</li>
+                            <li>\\( u_2 = 2^3 ${formatSignedNumber(c)} = ${u2_c} \\) (écart = ${diff2_c > 0 ? '+' : ''}${diff2_c})</li>
+                        </ul>
+                        <p>Les écarts ne sont pas constants (${diff1_c} \\neq ${diff2_c}).<br>
+                        Ce n'est <strong>PAS</strong> une suite arithmétique (c'est une suite cubique).</p>
+                    </div>
+                `;
+                break;
+                
+            case 2: // Géométrique : k^n + c
+                label = "Géométrique";
+                let u0_g = 1 + c; // k^0 = 1
+                let u1_g = k + c;
+                let u2_g = k*k + c;
+                let diff1_g = u1_g - u0_g;
+                let diff2_g = u2_g - u1_g;
+                
+                html = `
+                    <p>Soit \\( u_n = ${k}^n ${formatSignedNumber(c)} \\).</p>
+                    <p><strong>Question :</strong> Est-ce une suite arithmétique ? Justifiez.</p>
+                    
+                    <button id="btn-count" class="btn-show-sol" onclick="toggleSol('count')">👁️ Voir la solution</button>
+                    <div id="sol-count" class="solution-box">
+                        <p>Calculons les premiers termes :</p>
+                        <ul>
+                            <li>\\( u_0 = ${k}^0 ${formatSignedNumber(c)} = 1 ${formatSignedNumber(c)} = ${u0_g} \\)</li>
+                            <li>\\( u_1 = ${k}^1 ${formatSignedNumber(c)} = ${k} ${formatSignedNumber(c)} = ${u1_g} \\) (écart = ${diff1_g > 0 ? '+' : ''}${diff1_g})</li>
+                            <li>\\( u_2 = ${k}^2 ${formatSignedNumber(c)} = ${k*k} ${formatSignedNumber(c)} = ${u2_g} \\) (écart = ${diff2_g > 0 ? '+' : ''}${diff2_g})</li>
+                        </ul>
+                        <p>Les écarts ne sont pas constants (${diff1_g} \\neq ${diff2_g}).<br>
+                        Ce n'est <strong>PAS</strong> une suite arithmétique (c'est une suite géométrique de raison ${k}).</p>
+                    </div>
+                `;
+                break;
+                
+            case 3: // Fractionnaire : 1/(n+1) + c
+                label = "Fractionnaire";
+                // Utiliser n+1 pour éviter la division par zéro
+                let u0_f = 1 + c; // 1/1 = 1
+                let u1_f = Math.floor(100 * (0.5 + c)) / 100; // 1/2 = 0.5
+                let u2_f = Math.floor(100 * (0.333 + c)) / 100; // 1/3 ≈ 0.33
+                // Pour les écarts, on garde les fractions exactes
+                let diff1_f = "1/2"; // u1 - u0 = 0.5 - 1 = -0.5
+                let diff2_f = "1/6"; // u2 - u1 = 0.333 - 0.5 = -0.166...
+                
+                if(c !== 0) {
+                    diff1_f = "variable";
+                    diff2_f = "variable";
+                }
+                
+                html = `
+                    <p>Soit \\( u_n = \\dfrac{1}{n+1} ${formatSignedNumber(c)} \\).</p>
+                    <p><strong>Question :</strong> Est-ce une suite arithmétique ? Justifiez.</p>
+                    
+                    <button id="btn-count" class="btn-show-sol" onclick="toggleSol('count')">👁️ Voir la solution</button>
+                    <div id="sol-count" class="solution-box">
+                        <p>Calculons les premiers termes :</p>
+                        <ul>
+                            <li>\\( u_0 = \\dfrac{1}{1} ${formatSignedNumber(c)} = ${1+c} \\)</li>
+                            <li>\\( u_1 = \\dfrac{1}{2} ${formatSignedNumber(c)} = ${c > 0 ? c + 0.5 : c - 0.5} \\) (écart négatif)</li>
+                            <li>\\( u_2 = \\dfrac{1}{3} ${formatSignedNumber(c)} \\approx ${(1/3 + c).toFixed(2)} \\) (autre écart)</li>
+                        </ul>
+                        <p>Les différences ne sont pas constantes.<br>
+                        Ce n'est <strong>PAS</strong> une suite arithmétique (les dénominateurs changent).</p>
+                    </div>
+                `;
+                break;
+                
+            case 4: // Alternée : (-1)^n * k
+                label = "Alternée";
+                let u0_a = k; // (-1)^0 = 1
+                let u1_a = -k; // (-1)^1 = -1
+                let u2_a = k; // (-1)^2 = 1
+                
+                html = `
+                    <p>Soit \\( u_n = (-1)^n \\times ${k} \\).</p>
+                    <p><strong>Question :</strong> Est-ce une suite arithmétique ? Justifiez.</p>
+                    
+                    <button id="btn-count" class="btn-show-sol" onclick="toggleSol('count')">👁️ Voir la solution</button>
+                    <div id="sol-count" class="solution-box">
+                        <p>Calculons les premiers termes :</p>
+                        <ul>
+                            <li>\\( u_0 = (-1)^0 \\times ${k} = ${u0_a} \\)</li>
+                            <li>\\( u_1 = (-1)^1 \\times ${k} = ${u1_a} \\) (écart = ${u1_a - u0_a})</li>
+                            <li>\\( u_2 = (-1)^2 \\times ${k} = ${u2_a} \\) (écart = ${u2_a - u1_a})</li>
+                        </ul>
+                        <p>Les écarts ne sont pas constants (${u1_a - u0_a} \\neq ${u2_a - u1_a}).<br>
+                        Ce n'est <strong>PAS</strong> une suite arithmétique (la suite alterne entre ${k} et ${-k}).</p>
+                    </div>
+                `;
+                break;
+        }
+        
+        document.getElementById('suite-type-label').innerHTML = label;
         document.getElementById('ex-counter').innerHTML = html;
     }
 
-    /* 5. PBL */
     function generatePBL() {
         let initial = getRandomInt(20, 100);
         let saving = getRandomInt(10, 30);
+        let months = getRandomInt(5, 8);
         
         let html = `
             <p>Paul a ${initial} € et économise ${saving} € par mois.</p>
-            <p><strong>Question :</strong> Combien aura-t-il dans 10 mois ?</p>
+            <p><strong>Question :</strong> Combien aura-t-il dans ${months} mois ?</p>
             
             <button id="btn-pbl" class="btn-show-sol" onclick="toggleSol('pbl')">👁️ Voir la solution</button>
             <div id="sol-pbl" class="solution-box">
-                <p>C'est une suite arithmétique : \\( u_n = ${initial} + n \\times ${saving} \\).</p>
-                <p>Pour \\( n=10 \\) :</p>
-                <p>\\( u_{10} = ${initial} + 10 \\times ${saving} = ${initial} + ${10*saving} = \\mathbf{${initial + 10*saving}} \\) €.</p>
+                <p><strong>Méthode : Calculons mois par mois</strong></p>
+                <div class="step-calc">`;
+        
+        let current = initial;
+        for(let i=0; i<=months; i++) {
+            if(i === 0) {
+                html += `Mois 0 (départ) : ${current} €<br>`;
+            } else {
+                let prev = current;
+                current += saving;
+                html += `Mois ${i} : ${prev} + ${saving} = ${current} €<br>`;
+            }
+        }
+        
+        html += `</div>
+                <p>Au bout de ${months} mois, Paul aura <strong>${current} €</strong>.</p>
+                
+                <div class="schema-box">
+                    <h4>🔍 Observation du schéma :</h4>
+                    <p style="font-size:0.9em;">On a fait ${months} ajouts de ${saving} €</p>
+                    <div style="margin:15px 0; font-size:1.1em;">
+                        <span class="term-box">${initial}</span>`;
+        
+        for(let i=0; i<months; i++) {
+            html += `<span class="arrow">→(+${saving})→</span>`;
+        }
+        
+        html += `<span class="term-box" style="background:#c8e6c9;">${current}</span>
+                    </div>
+                    <p class="jump-label">Total des ajouts : ${months} × ${saving} = ${months*saving}</p>
+                    <p style="margin-top:10px; font-style:italic; color:#666;">
+                        Remarque : On aurait pu calculer directement ${initial} + ${months}×${saving} = ${current}<br>
+                        mais la méthode pas-à-pas vérifie le résultat !
+                    </p>
+                </div>
             </div>
         `;
         document.getElementById('pbl-content').innerHTML = html;
     }
 
-    /* 6. EXERCICES DRILL (NOUVEAU) */
     function generateDrills() {
         let container = document.getElementById('drill-exercises');
         let html = "";
 
-        // EXERCICE A : Trouver u_n
+        // EXERCICE A
         let u0_a = getRandomInt(1, 10);
-        let r_a = getRandomInt(2, 6);
-        let n_a = getRandomInt(20, 40);
-        let res_a = u0_a + n_a * r_a;
-
+        let r_a = getRandomInt(2, 5);
+        let n_a = getRandomInt(4, 7);
+        
         html += `
         <div style="margin-bottom:30px;">
-            <p><strong>Exercice A :</strong> \\( (u_n) \\) est arithmétique de raison \\( r=${r_a} \\) et \\( u_0=${u0_a} \\). Calculer \\( u_{${n_a}} \\).</p>
+            <p><strong>Exercice A :</strong> suite arithmétique de raison \\( r=${r_a} \\) et \\( u_0=${u0_a} \\). 
+            Calculez \\( u_{${n_a}} \\) en détaillant tous les termes.</p>
+            
             <button id="btn-dr1" class="btn-show-sol" onclick="toggleSol('dr1')">👁️ Voir la solution</button>
             <div id="sol-dr1" class="solution-box">
-                <p>Formule : \\( u_n = u_0 + n \\times r \\)</p>
-                <p>\\( u_{${n_a}} = ${u0_a} + ${n_a} \\times ${r_a} = ${u0_a} + ${n_a*r_a} = \\mathbf{${res_a}} \\)</p>
+                <p><strong>Calculs intermédiaires :</strong></p>
+                <div class="step-calc">`;
+        
+        let val_a = u0_a;
+        for(let i=0; i<=n_a; i++) {
+            if(i === 0) {
+                html += `\\( u_${i} = ${val_a} \\)<br>`;
+            } else if(i === n_a) {
+                html += `<strong>\\( u_${i} = ${val_a} \\)</strong> ← Terme demandé<br>`;
+            } else {
+                html += `\\( u_${i} = ${val_a} \\)<br>`;
+            }
+            if(i < n_a) val_a += r_a;
+        }
+        
+        html += `</div>
+                
+                <div class="schema-box">
+                    <h4>🔗 Schéma des sauts :</h4>
+                    <p>De \\( u_0 \\) à \\( u_${n_a} \\), il y a ${n_a} "sauts" de \\( ${r_a} \\)</p>
+                    <div style="margin:15px 0; font-family:monospace; font-size:1.2em;">
+                        <span class="term-box">${u0_a}</span>`;
+        
+        let curr = u0_a;
+        for(let i=1; i<=n_a; i++) {
+            curr += r_a;
+            html += `<span style="color:#d32f2f; font-weight:bold;">→(+${r_a})→</span>`;
+            if(i === n_a) {
+                html += `<span class="term-box" style="background:#ffeb3b; border-color:#f57f17;">${curr}</span>`;
+            } else {
+                html += `<span class="term-box" style="opacity:${0.5 + i/(2*n_a)};">${curr}</span>`;
+            }
+        }
+        
+        html += `</div>
+                    <p style="background:#fff9c4; padding:8px; border-radius:4px; margin-top:10px;">
+                        <strong>Constat :</strong> On a fait ${n_a} ajouts de ${r_a}.<br>
+                        <em>(Formule directe interdite dans le calcul : ${u0_a} + ${n_a}×${r_a} = ${curr})</em>
+                    </p>
+                </div>
             </div>
         </div>`;
 
-        // EXERCICE B : Trouver la raison
-        let u0_b = getRandomInt(5, 20);
-        let u5_b = getRandomInt(30, 80);
-        // On s'assure que (u5 - u0) est divisible par 5 pour avoir un entier
-        while ((u5_b - u0_b) % 5 !== 0) { u5_b++; }
-        let r_b = (u5_b - u0_b) / 5;
-
+        // EXERCICE B
+        let p_b = getRandomInt(2, 4);
+        let up_b = getRandomInt(10, 25);
+        let r_b = getRandomInt(3, 6);
+        let n_b = p_b + getRandomInt(3, 5);
+        let nbSteps = n_b - p_b;
+        
         html += `
         <div style="margin-bottom:30px;">
-            <p><strong>Exercice B :</strong> Une suite arithmétique vérifie \\( u_0=${u0_b} \\) et \\( u_5=${u5_b} \\). Quelle est sa raison \\( r \\) ?</p>
+            <p><strong>Exercice B :</strong> suite arithmétique de raison \\( r=${r_b} \\). 
+            On sait que \\( u_${p_b}=${up_b} \\). Calculez \\( u_${n_b} \\).</p>
+            
             <button id="btn-dr2" class="btn-show-sol" onclick="toggleSol('dr2')">👁️ Voir la solution</button>
             <div id="sol-dr2" class="solution-box">
-                <p>On sait que \\( u_5 = u_0 + 5r \\).</p>
-                <p>Donc \\( 5r = u_5 - u_0 = ${u5_b} - ${u0_b} = ${u5_b - u0_b} \\).</p>
-                <p>\\( r = \\frac{${u5_b - u0_b}}{5} = \\mathbf{${r_b}} \\).</p>
+                <p><strong>Calculs progressifs à partir de \\( u_${p_b} \\) :</strong></p>
+                <div class="step-calc">`;
+        
+        let val_b = up_b;
+        html += `Départ : \\( u_${p_b} = ${val_b} \\)<br>`;
+        for(let i=p_b+1; i<=n_b; i++) {
+            let prev = val_b;
+            val_b += r_b;
+            html += `\\( u_${i} = ${prev} + ${r_b} = ${val_b} \\)<br>`;
+        }
+        
+        html += `</div>
+                <p>Résultat : \\( u_${n_b} = ${val_b} \\)</p>
+                
+                <div class="schema-box" style="background:#f3e5f5; border-color:#9c27b0;">
+                    <h4>🔗 Schéma de la distance entre \\( u_${p_b} \\) et \\( u_${n_b} \\) :</h4>
+                    <p>Nombre d'intervalles : \\( ${n_b} - ${p_b} = ${nbSteps} \\)</p>
+                    <div style="margin:15px 0; overflow-x:auto;">`;
+        
+        html += `<div style="display:inline-block; text-align:center; margin:0 3px;">
+                    <span class="term-box">${up_b}</span><br>
+                    <small style="color:#666;">\\( u_${p_b} \\)</small>
+                 </div>`;
+        
+        let currB = up_b;
+        for(let i=p_b+1; i<=n_b; i++) {
+            currB += r_b;
+            let isLast = (i === n_b);
+            html += `<span style="color:#d32f2f; font-weight:bold;">→(+${r_b})→</span>
+                     <div style="display:inline-block; text-align:center; margin:0 3px;">
+                        <span class="term-box" style="${isLast ? 'background:#ffeb3b; border-color:#f57f17;' : ''}">${currB}</span><br>
+                        <small style="color:#666;">\\( u_${i} \\)</small>
+                     </div>`;
+        }
+        
+        html += `</div>
+                    <p class="jump-label">Total ajouté : ${nbSteps} × ${r_b} = ${nbSteps*r_b}</p>
+                    <p style="background:#fff; padding:8px; border-radius:4px; margin-top:10px; border:1px dashed #9c27b0;">
+                        <strong>Observation :</strong> On a fait ${nbSteps} pas de ${r_b}.<br>
+                        <em>Constat final (formule générale) : 
+                        \\( u_${n_b} = u_${p_b} + ${nbSteps} \\times ${r_b} = ${up_b} + ${nbSteps*r_b} = ${val_b} \\)</em>
+                    </p>
+                </div>
             </div>
         </div>`;
 
         container.innerHTML = html;
     }
 
-    /** Gestion Modale **/
     let modal = document.getElementById("copyrightModal");
     function openModal() { modal.style.display = "block"; }
     function closeModal() { modal.style.display = "none"; }
