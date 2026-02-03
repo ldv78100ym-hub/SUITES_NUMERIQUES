@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cours et Exercices Dynamiques : Les Suites Géométriques (Aléatoires)</title>
+    
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* --- Styles identiques au fichier original --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #8b5cf6; /* Changement de couleur vers le violet pour distinguer */
+            --primary-dark: #7c3aed;
+            --secondary: #64748b;
+            --bg-sidebar: #1e293b;
+            --bg-main: #f8fafc;
+            --text-dark: #0f172a;
+            --text-light: #f1f5f9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .exercise-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .exercise-item {
+            padding: 15px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .exercise-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .exercise-item.active {
+            background: var(--primary);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .exercise-number {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--text-dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            flex-shrink: 0;
+        }
+
+        .top-bar h1 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        .top-bar h1 strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--text-dark);
+            border: 2px solid var(--accent);
+        }
+
+        .btn-accent:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .random-indicator {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid var(--accent);
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            background: white;
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .slide::-webkit-scrollbar { width: 10px; }
+        .slide::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        .slide::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 8px; border: 2px solid white; }
+        .slide::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
+
+        .slide-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary);
+            flex-shrink: 0;
+        }
+
+        .slide-category {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--text-dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slide h2 {
+            font-size: 2.2rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .slide-content {
+            flex: 1;
+            font-size: 1.3rem;
+            line-height: 1.7;
+            color: var(--text-dark);
+            overflow-y: visible;
+        }
+
+        .slide-content p { margin-bottom: 20px; }
+
+        .math-block {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary);
+            font-size: 1.2rem;
+            overflow-x: auto;
+        }
+
+        .graph-container {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .navigation-hint {
+            position: absolute;
+            bottom: 30px;
+            right: 60px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .nav-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.2rem;
+        }
+
+        .nav-arrow:hover { background: var(--primary-dark); transform: scale(1.1); }
+        .nav-arrow:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal { transform: scale(1); }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .modal-header h3 { font-size: 1.5rem; font-weight: 600; }
+
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+        }
+
+        .solution-step {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 3px solid var(--success);
+        }
+
+        .solution-step h4 { color: var(--success); margin-bottom: 10px; font-weight: 600; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide { animation: fadeIn 0.4s ease; }
+        
+        @media (max-width: 1024px) {
+            .sidebar { width: 260px; }
+            .slide { padding: 40px; }
+            .slide h2 { font-size: 1.8rem; }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; max-height: 35vh; }
+            .slide-container { padding: 20px; }
+            .navigation-hint { right: 30px; bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📚 Menu des Exercices</h2>
+        </div>
+        <div class="exercise-list" id="exerciseList">
+        </div>
+        <div class="sidebar-footer">
+            Suites Géométriques Aléatoires © 2026
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <h1><strong>Mathématiques</strong> | Suites Géométriques Dynamiques</h1>
+            <div class="controls">
+                <button class="btn btn-accent" onclick="regenerateAll()">
+                    <span>🎲</span> Nouvelles valeurs
+                </button>
+                <button class="btn btn-secondary" onclick="openCopyright()">
+                    <span>⚖️</span> Info
+                </button>
+                <button class="btn btn-primary" onclick="openSolution()">
+                    <span>💡</span> Voir la solution
+                </button>
+            </div>
+        </div>
+
+        <div class="slide-container">
+            <div class="slide" id="currentSlide"></div>
+            <div class="navigation-hint">
+                <span>Navigation :</span>
+                <button class="nav-arrow" onclick="prevExercise()" id="btnPrev">←</button>
+                <button class="nav-arrow" onclick="nextExercise()" id="btnNext">→</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="solutionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>💡 Solution détaillée</h3>
+                <button class="modal-close" onclick="closeModal('solutionModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="solutionContent"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="copyrightModal">
+        <div class="modal">
+            <div class="modal-header" style="background: #1e293b;">
+                <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
+                <button class="modal-close" onclick="closeModal('copyrightModal')">&times;</button>
+            </div>
+            <div class="modal-body" style="font-size: 0.95rem; line-height: 1.6;">
+                <p><strong>Auteur :</strong> Yann Merdy (yann.merdy@gmail.com) - Janvier 2026</p>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 10px 0;">Licence d'Utilisation Non Commerciale</h4>
+                
+                <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Les Évolutions") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
+                
+                <h4 style="color: var(--success); margin: 20px 0 10px 0;">Conditions :</h4>
+                
+                <p><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu uniquement à des fins personnelles, éducatives et non lucratives.</p>
+                
+                <p><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins commerciales, lucratives ou professionnelles est strictement interdite sans un accord écrit préalable et explicite de l'auteur.</p>
+                
+                <p><strong>Attribution :</strong> Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</p>
+                
+                <p style="margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px;">
+                    Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentValues = {};
+        let currentExercise = 0;
+
+        const rand = {
+            int: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+            choice: (arr) => arr[Math.floor(Math.random() * arr.length)],
+            shuffle: (arr) => {
+                const newArr = [...arr];
+                for (let i = newArr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+                }
+                return newArr;
+            },
+            multiple: (min, max, step) => {
+                const steps = Math.floor((max - min) / step);
+                return min + Math.floor(Math.random() * (steps + 1)) * step;
+            }
+        };
+
+        const generators = {
+            1: () => {
+                // EX 1: Identification (Geometric vs Arithmetic)
+                // 2/3 chance d'être Géométrique (le sujet principal)
+                const isGeometric = Math.random() < 0.666;
+                
+                if (isGeometric) {
+                    const u0 = rand.choice([2, 3, 4, 5]);
+                    const q = rand.choice([2, 3]); // Petite raison entière
+                    return {
+                        isGeometric: true,
+                        u0, q,
+                        u1: u0 * q,
+                        u2: u0 * q * q,
+                        u3: u0 * q * q * q,
+                        ratio1: q,
+                        ratio2: q
+                    };
+                } else {
+                    // Arithmétique (piège)
+                    const u0 = rand.int(5, 20);
+                    const r = rand.int(3, 8);
+                    return {
+                        isGeometric: false,
+                        u0, r,
+                        u1: u0 + r,
+                        u2: u0 + 2*r,
+                        u3: u0 + 3*r,
+                        ratio1: ((u0+r)/u0).toFixed(2),
+                        ratio2: ((u0+2*r)/(u0+r)).toFixed(2)
+                    };
+                }
+            },
+            2: () => {
+                // Ex 2: Dépréciation voiture (Pourcentage de baisse)
+                const prix = rand.multiple(15000, 30000, 1000);
+                const pertePct = rand.choice([10, 15, 20, 25]);
+                const q = 1 - (pertePct / 100);
+                const anneeDemande = 2;
+                const prix2ans = Math.round(prix * q * q);
+                return { prix, pertePct, q, anneeDemande, prix2ans };
+            },
+            3: () => {
+                // Ex 3: Croissance Virale (Rumeur/Virus)
+                const depart = rand.int(5, 20);
+                const q = rand.int(2, 4); // Double ou triple
+                const heure = 4;
+                const final = depart * Math.pow(q, heure);
+                return { depart, q, heure, final };
+            },
+            4: () => {
+                // Ex 4: Intensité lumineuse (Profondeur)
+                const perte = rand.choice([10, 20, 50]);
+                const q = 1 - (perte/100);
+                const u0 = 100; // 100%
+                const prof = 3;
+                const res = Math.round(u0 * Math.pow(q, prof) * 10) / 10;
+                return { perte, q, prof, res };
+            },
+            5: () => {
+                // Ex 5: Rebond d'une balle
+                const h0 = rand.multiple(100, 300, 20);
+                const coeffArr = [0.5, 0.75, 0.8, 0.9];
+                const coeff = rand.choice(coeffArr);
+                const rebonds = 3;
+                const hFinal = Math.round(h0 * Math.pow(coeff, rebonds));
+                return { h0, coeff, rebonds, hFinal };
+            },
+            6: () => {
+                // Ex 6: Salaire (Comparaison Linéaire vs Expo)
+                const salaire = rand.multiple(1500, 2500, 100);
+                const augFixe = rand.multiple(30, 80, 10);
+                const augPct = rand.choice([2, 3, 4, 5]);
+                const annees = 5;
+                
+                const sFixe = salaire + augFixe * annees;
+                const sPct = Math.round(salaire * Math.pow(1 + augPct/100, annees));
+                
+                return { salaire, augFixe, augPct, annees, sFixe, sPct };
+            },
+            7: () => {
+                // EX 7 : Situations (Vrai/Faux)
+                // On mélange : 2 Géo (Vrai), 1 Arith (Faux)
+                const types = rand.shuffle([
+                    { isGeo: true, type: 'bacterie' },
+                    { isGeo: true, type: 'epargne' },
+                    { isGeo: false, type: 'taxi' }
+                ]);
+                
+                const situations = types.map(t => {
+                    if (t.type === 'bacterie') {
+                        const init = rand.int(100, 500);
+                        return {
+                            texte: `Une population de bactéries triple toutes les heures. Départ : ${init}.`,
+                            conclusion: `Oui, suite géométrique de raison q = 3.`,
+                            relation: `u_{n+1} = 3 \\times u_n`
+                        };
+                    } else if (t.type === 'epargne') {
+                        const taux = rand.choice([2, 3, 5]);
+                        return {
+                            texte: `Un capital placé rapporte ${taux}% d'intérêts composés par an.`,
+                            conclusion: `Oui, suite géométrique de raison q = ${1 + taux/100}.`,
+                            relation: `u_{n+1} = ${1 + taux/100} \\times u_n`
+                        };
+                    } else {
+                        // Taxi (Arithmétique)
+                        const prise = rand.int(2, 5);
+                        const km = rand.int(1, 2);
+                        return {
+                            texte: `Un taxi facture ${prise}€ de prise en charge puis ${km}€ par km parcouru.`,
+                            conclusion: `Non, c'est une suite arithmétique (croissance linéaire), pas géométrique.`,
+                            relation: `u_{n+1} = u_n + ${km}`
+                        };
+                    }
+                });
+                return { situations };
+            },
+            8: () => {
+                // Ex 8: Pliage papier
+                const epaisseur = 0.1;
+                const plis = rand.int(6, 12); // Pour que ça reste lisible
+                const final = epaisseur * Math.pow(2, plis);
+                return { epaisseur, plis, final };
+            },
+            9: () => {
+                // Ex 9: Intérêts composés (Calcul capital)
+                const C0 = rand.multiple(1000, 5000, 500);
+                const t = rand.choice([3, 4, 5, 6]);
+                const n = rand.int(5, 10);
+                const Cn = Math.round(C0 * Math.pow(1 + t/100, n));
+                return { C0, t, n, Cn };
+            },
+            10: () => {
+                // Ex 10: Légende de l'échiquier (Puissances de 2)
+                // Case n (de 1 à 64). u_n = 2^(n-1)
+                const caseNum = rand.int(5, 15); // On reste petit pour l'exemple
+                const grains = Math.pow(2, caseNum - 1);
+                return { caseNum, grains };
+            },
+            11: () => {
+                // Ex 11: Calcul de terme lointain
+                const u0 = rand.multiple(10, 100, 10);
+                const q = rand.choice([0.5, 2, 1.1, 0.9]);
+                const n = 10;
+                const un = u0 * Math.pow(q, n);
+                // Arrondi si décimal
+                const res = Number.isInteger(un) ? un : un.toFixed(4);
+                return { u0, q, n, res };
+            },
+            12: () => {
+                // Ex 12: Graphique exponentiel
+                const isGrowth = Math.random() > 0.5;
+                const u0 = isGrowth ? rand.int(2, 10) : rand.int(100, 200);
+                const q = isGrowth ? rand.choice([1.5, 2]) : 0.5;
+                
+                const points = [];
+                for(let i=0; i<=5; i++) {
+                    const val = u0 * Math.pow(q, i);
+                    // Scaling Y pour affichage SVG (max h ~ 250px)
+                    // Si croissance: max val ~ u0*2^5 = 32*u0. Si décroissance: max = u0.
+                    let y;
+                    if(isGrowth) {
+                        y = 280 - (val / (u0 * Math.pow(q, 5))) * 250;
+                    } else {
+                        y = 280 - (val / u0) * 250;
+                    }
+                    points.push({ x: 50 + i*80, y: y, val: Math.round(val*10)/10, i });
+                }
+                return { isGrowth, u0, q, points };
+            }
+        };
+
+        const exerciseTemplates = {
+            1: (v) => ({
+                category: "Identification",
+                title: "Reconnaître une Suite Géométrique",
+                content: `
+                    <p>On observe l'évolution d'une quantité sur 4 étapes :</p>
+                    <div class="math-block">
+                        ${v.u0} ; ${v.u1} ; ${v.u2} ; ${v.u3}
+                    </div>
+                    <p><strong>Question :</strong> S'agit-il d'une suite géométrique ? Justifiez en calculant les rapports entre termes consécutifs.</p>
+                `,
+                solution: v.isGeometric ? `
+                    <div class="solution-step">
+                        <h4>Calcul des rapports</h4>
+                        <p>\\(\\frac{u_1}{u_0} = \\frac{${v.u1}}{${v.u0}} = ${v.ratio1}\\)</p>
+                        <p>\\(\\frac{u_2}{u_1} = \\frac{${v.u2}}{${v.u1}} = ${v.ratio2}\\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Conclusion</h4>
+                        <p>Les rapports sont constants. On passe d'un terme au suivant en multipliant toujours par <strong>${v.q}</strong>.</p>
+                        <p>C'est donc une <strong>suite géométrique</strong> de raison \\(q = ${v.q}\\).</p>
+                    </div>
+                ` : `
+                    <div class="solution-step">
+                        <h4>Calcul des rapports</h4>
+                        <p>\\(\\frac{u_1}{u_0} = \\frac{${v.u1}}{${v.u0}} \\approx ${v.ratio1}\\)</p>
+                        <p>\\(\\frac{u_2}{u_1} = \\frac{${v.u2}}{${v.u1}} \\approx ${v.ratio2}\\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Conclusion</h4>
+                        <p>Les rapports ne sont pas constants. Ce n'est pas une multiplication fixe.</p>
+                        <p><strong>Ce n'est pas une suite géométrique.</strong></p>
+                        <p>(Note : C'était une suite arithmétique où l'on ajoute ${v.r} à chaque fois).</p>
+                    </div>
+                `
+            }),
+            2: (v) => ({
+                category: "Pourcentages",
+                title: "Dépréciation d'un Véhicule",
+                content: `
+                    <p>Une voiture neuve coûte <strong>${v.prix} €</strong>.</p>
+                    <p>Chaque année, elle perd <strong>${v.pertePct} %</strong> de sa valeur par rapport à l'année précédente.</p>
+                    <p>1. Quelle est la raison \\(q\\) de la suite géométrique modélisant la valeur ?</p>
+                    <p>2. Quelle sera la valeur de la voiture au bout de 2 ans ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>1. Coefficient multiplicateur (Raison)</h4>
+                        <p>Une baisse de ${v.pertePct}% revient à multiplier par :</p>
+                        <p>\\( q = 1 - \\frac{${v.pertePct}}{100} = \\mathbf{${v.q.toFixed(2)}} \\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>2. Valeur après 2 ans</h4>
+                        <p>On utilise la formule \\( u_n = u_0 \\times q^n \\) avec \\(n=2\\).</p>
+                        <p>\\( u_2 = ${v.prix} \\times ${v.q.toFixed(2)}^2 \\)</p>
+                        <p>\\( u_2 = ${v.prix} \\times ${(v.q*v.q).toFixed(4)} \\approx \\mathbf{${v.prix2ans} \\text{ €}} \\)</p>
+                    </div>
+                `
+            }),
+            3: (v) => ({
+                category: "Croissance Exponentielle",
+                title: "Propagation d'une rumeur",
+                content: `
+                    <p>Une rumeur démarre avec <strong>${v.depart}</strong> personnes au courant à 8h00.</p>
+                    <p>Le nombre de personnes au courant est <strong>multiplié par ${v.q}</strong> chaque heure.</p>
+                    <p>Combien de personnes connaîtront la rumeur au bout de ${v.heure} heures ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Modélisation</h4>
+                        <p>C'est une suite géométrique de premier terme \\(u_0 = ${v.depart}\\) et de raison \\(q = ${v.q}\\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Calcul</h4>
+                        <p>Après ${v.heure} heures (\\(n=${v.heure}\\)) :</p>
+                        <p>\\( u_{${v.heure}} = u_0 \\times q^{${v.heure}} \\)</p>
+                        <p>\\( u_{${v.heure}} = ${v.depart} \\times ${v.q}^{${v.heure}} = ${v.depart} \\times ${Math.pow(v.q, v.heure)} = \\mathbf{${v.final}} \\)</p>
+                    </div>
+                `
+            }),
+            4: (v) => ({
+                category: "Physique",
+                title: "Intensité Lumineuse sous l'eau",
+                content: `
+                    <p>L'intensité lumineuse en surface est de 100%.</p>
+                    <p>Elle diminue de <strong>${v.perte}%</strong> pour chaque mètre de profondeur descendu.</p>
+                    <p>Quelle est l'intensité (en %) à <strong>${v.prof} mètres</strong> de profondeur ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Coefficient multiplicateur</h4>
+                        <p>Baisse de ${v.perte}% \\(\\rightarrow\\) multiplier par \\( 1 - \\frac{${v.perte}}{100} = ${v.q} \\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Calcul à n = ${v.prof}</h4>
+                        <p>\\( I_{${v.prof}} = 100 \\times (${v.q})^{${v.prof}} \\)</p>
+                        <p>\\( I_{${v.prof}} \\approx \\mathbf{${v.res} \\% } \\)</p>
+                    </div>
+                `
+            }),
+            5: (v) => ({
+                category: "Physique",
+                title: "Rebonds d'une balle",
+                content: `
+                    <p>Une balle est lâchée d'une hauteur de <strong>${v.h0} cm</strong>.</p>
+                    <p>À chaque rebond, elle remonte à <strong>${v.coeff*100}%</strong> (soit \\(\\times ${v.coeff}\\)) de sa hauteur précédente.</p>
+                    <p>Quelle hauteur atteint-elle après le <strong>3ème rebond</strong> ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Formule explicite</h4>
+                        <p>Hauteur après \\(n\\) rebonds : \\( h_n = h_0 \\times q^n \\)</p>
+                        <p>Ici \\( h_0 = ${v.h0} \\) et \\( q = ${v.coeff} \\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Résultat</h4>
+                        <p>\\( h_3 = ${v.h0} \\times ${v.coeff}^3 \\)</p>
+                        <p>\\( h_3 \\approx \\mathbf{${v.hFinal} \\text{ cm}} \\)</p>
+                    </div>
+                `
+            }),
+            6: (v) => ({
+                category: "Comparaison",
+                title: "Salaire : Augmentation fixe ou pourcentage ?",
+                content: `
+                    <p>Vous gagnez <strong>${v.salaire} €</strong>. On vous propose deux types d'augmentation annuelle sur 5 ans :</p>
+                    <ul>
+                        <li><strong>Option A :</strong> + ${v.augFixe} € chaque année (Arithmétique).</li>
+                        <li><strong>Option B :</strong> + ${v.augPct} % chaque année (Géométrique).</li>
+                    </ul>
+                    <p>Quel salaire est le plus avantageux au bout de 5 ans ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Option A (Arithmétique)</h4>
+                        <p>\\( u_5 = u_0 + 5 \\times r = ${v.salaire} + 5 \\times ${v.augFixe} = \\mathbf{${v.sFixe} \\text{ €}} \\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Option B (Géométrique)</h4>
+                        <p>Raison \\( q = 1 + \\frac{${v.augPct}}{100} = ${1 + v.augPct/100} \\)</p>
+                        <p>\\( v_5 = v_0 \\times q^5 = ${v.salaire} \\times (${1 + v.augPct/100})^5 \\approx \\mathbf{${v.sPct} \\text{ €}} \\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Conclusion</h4>
+                        <p>L'option <strong>${v.sPct > v.sFixe ? 'B (Pourcentage)' : 'A (Fixe)'}</strong> est la plus avantageuse.</p>
+                    </div>
+                `
+            }),
+            7: (v) => ({
+                category: "Vrai / Faux",
+                title: "Identifier les situations géométriques",
+                content: `
+                    <p>Pour chacune des situations ci-dessous, dire si elle correspond à une suite géométrique :</p>
+                    <ol>
+                        ${v.situations.map(s => `<li style="margin-bottom:10px;">${s.texte}</li>`).join('')}
+                    </ol>
+                `,
+                solution: `
+                    ${v.situations.map((s, i) => `
+                        <div class="solution-step">
+                            <h4>Situation ${i+1}</h4>
+                            <p>${s.conclusion}</p>
+                            <p>Modèle : \\( ${s.relation} \\)</p>
+                        </div>
+                    `).join('')}
+                `
+            }),
+            8: (v) => ({
+                category: "Puissances",
+                title: "Le Pliage de Papier",
+                content: `
+                    <p>Une feuille de papier a une épaisseur de ${v.epaisseur} mm.</p>
+                    <p>On suppose qu'on peut la plier en deux autant de fois qu'on veut. L'épaisseur double à chaque pli.</p>
+                    <p>Quelle est l'épaisseur théorique après <strong>${v.plis} plis</strong> ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Analyse</h4>
+                        <p>L'épaisseur double : c'est une suite géométrique de raison \\(q=2\\).</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Calcul</h4>
+                        <p>\\( E_{${v.plis}} = 0.1 \\times 2^{${v.plis}} \\)</p>
+                        <p>\\( 2^{${v.plis}} = ${Math.pow(2, v.plis)} \\)</p>
+                        <p>Épaisseur totale = <strong>${v.final} mm</strong> (soit ${(v.final/10).toFixed(1)} cm).</p>
+                    </div>
+                `
+            }),
+            9: (v) => ({
+                category: "Finance",
+                title: "Intérêts Composés",
+                content: `
+                    <p>On place un capital \\(C_0 = ${v.C0} \\text{ €}\\) à un taux annuel de <strong>${v.t} %</strong>.</p>
+                    <p>Les intérêts s'ajoutent au capital chaque année (intérêts composés).</p>
+                    <p>Calculez le capital disponible au bout de ${v.n} ans.</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Formule des intérêts composés</h4>
+                        <p>C'est une suite géométrique de raison \\( q = 1 + \\frac{t}{100} = 1,0${v.t} \\).</p>
+                        <p>\\( C_n = C_0 \\times (1,0${v.t})^n \\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Application</h4>
+                        <p>\\( C_{${v.n}} = ${v.C0} \\times (1,0${v.t})^{${v.n}} \\)</p>
+                        <p>\\( C_{${v.n}} \\approx \\mathbf{${v.Cn} \\text{ €}} \\)</p>
+                    </div>
+                `
+            }),
+            10: (v) => ({
+                category: "Légende",
+                title: "Grains de riz sur l'échiquier",
+                content: `
+                    <p>Selon la légende, on pose 1 grain de riz sur la 1ère case, 2 sur la 2ème, 4 sur la 3ème, en doublant à chaque case.</p>
+                    <p>Combien de grains y a-t-il sur la <strong>case n°${v.caseNum}</strong> ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Suite des puissances de 2</h4>
+                        <p>Case 1 : \\(1 = 2^0\\)</p>
+                        <p>Case 2 : \\(2 = 2^1\\)</p>
+                        <p>Case 3 : \\(4 = 2^2\\)</p>
+                        <p>Case \\(n\\) : \\(u_n = 2^{n-1}\\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Résultat</h4>
+                        <p>Pour la case ${v.caseNum}, l'exposant est ${v.caseNum - 1}.</p>
+                        <p>Nombre de grains = \\( 2^{${v.caseNum-1}} = \\mathbf{${v.grains}} \\).</p>
+                    </div>
+                `
+            }),
+            11: (v) => ({
+                category: "Abstrait",
+                title: "Calcul de terme général",
+                content: `
+                    <p>Soit une suite géométrique \\((u_n)\\) définie par :</p>
+                    <ul>
+                        <li>Premier terme \\( u_0 = ${v.u0} \\)</li>
+                        <li>Raison \\( q = ${v.q} \\)</li>
+                    </ul>
+                    <p>Calculez la valeur de \\( u_{${v.n}} \\).</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Formule explicite</h4>
+                        <p>\\( u_n = u_0 \\times q^n \\)</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Calcul</h4>
+                        <p>\\( u_{10} = ${v.u0} \\times (${v.q})^{10} \\)</p>
+                        <p>\\( u_{10} \\approx \\mathbf{${v.res}} \\)</p>
+                    </div>
+                `
+            }),
+            12: (v) => ({
+                category: "Visuel",
+                title: "Représentation Graphique",
+                content: `
+                    <p>Voici la représentation graphique d'une suite.</p>
+                    <div class="graph-container">
+                        <svg width="100%" height="300" viewBox="0 0 500 300">
+                            <line x1="40" y1="280" x2="480" y2="280" stroke="#cbd5e1" stroke-width="2" />
+                            <line x1="40" y1="20" x2="40" y2="280" stroke="#cbd5e1" stroke-width="2" />
+                            
+                            ${v.points.map(p => `
+                                <circle cx="${p.x}" cy="${p.y}" r="6" fill="#8b5cf6" />
+                                <text x="${p.x}" y="295" text-anchor="middle" font-size="12" fill="#64748b">n=${p.i}</text>
+                            `).join('')}
+                            
+                            <path d="M ${v.points.map(p => `${p.x} ${p.y}`).join(' L ')}" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,5" opacity="0.5" />
+                        </svg>
+                    </div>
+                    <p>Comment évoluent les points ? Est-ce une droite ?</p>
+                `,
+                solution: `
+                    <div class="solution-step">
+                        <h4>Observation</h4>
+                        <p>Les points ne sont pas alignés sur une droite (contrairement aux suites arithmétiques).</p>
+                        <p>Ils suivent une courbe exponentielle caractéristique des suites géométriques.</p>
+                    </div>
+                    <div class="solution-step">
+                        <h4>Paramètres cachés</h4>
+                        <p>C'était une suite de premier terme ${v.u0} et de raison \\(q=${v.q}\\).</p>
+                        <p>C'est une suite <strong>${v.isGrowth ? 'croissante (q > 1)' : 'décroissante (0 < q < 1)'}</strong>.</p>
+                    </div>
+                `
+            })
+        };
+
+        // --- Fonctions inchangées pour la gestion de l'interface ---
+        
+        function init() {
+            const list = document.getElementById('exerciseList');
+            list.innerHTML = '';
+            
+            Object.keys(exerciseTemplates).forEach((key, index) => {
+                const temp = exerciseTemplates[key]({
+                    // Fake values just to get title
+                    u0:0, u1:0, u2:0, u3:0, ratio1:0, ratio2:0, q:0, prix:0, pertePct:0, depart:0, heure:0, final:0, points:[], situations:[]
+                }); 
+                
+                const item = document.createElement('div');
+                item.className = 'exercise-item';
+                if (index === 0) item.classList.add('active');
+                item.innerHTML = `<span class="exercise-number">${key}</span> ${temp.title}`;
+                item.onclick = () => loadExercise(parseInt(key));
+                list.appendChild(item);
+            });
+
+            regenerateAll();
+            loadExercise(1);
+        }
+
+        function regenerateAll() {
+            Object.keys(generators).forEach(key => {
+                currentValues[key] = generators[key]();
+            });
+            loadExercise(currentExercise || 1);
+        }
+
+        function loadExercise(id) {
+            currentExercise = id;
+            
+            // Highlight sidebar
+            document.querySelectorAll('.exercise-item').forEach(el => el.classList.remove('active'));
+            const listItems = document.querySelectorAll('.exercise-item');
+            if (listItems[id-1]) listItems[id-1].classList.add('active');
+
+            // Generate content
+            const values = currentValues[id];
+            const template = exerciseTemplates[id](values);
+            
+            const slide = document.getElementById('currentSlide');
+            slide.innerHTML = `
+                <div class="slide-header">
+                    <span class="slide-category">${template.category}</span>
+                    <h2>${template.title}</h2>
+                </div>
+                <div class="slide-content">
+                    ${template.content}
+                </div>
+            `;
+
+            // Reset navigation buttons
+            document.getElementById('btnPrev').disabled = (id === 1);
+            document.getElementById('btnNext').disabled = (id === Object.keys(exerciseTemplates).length);
+
+            // Typeset Math
+            if (window.MathJax) {
+                MathJax.typesetPromise([slide]);
+            }
+        }
+
+        function nextExercise() {
+            if (currentExercise < Object.keys(exerciseTemplates).length) {
+                loadExercise(currentExercise + 1);
+            }
+        }
+
+        function prevExercise() {
+            if (currentExercise > 1) {
+                loadExercise(currentExercise - 1);
+            }
+        }
+
+        function openSolution() {
+            const exId = currentExercise;
+            const values = currentValues[exId];
+            const ex = exerciseTemplates[exId](values);
+            document.getElementById('solutionContent').innerHTML = ex.solution;
+            document.getElementById('solutionModal').classList.add('active');
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise([document.getElementById('solutionContent')]);
+            }
+        }
+
+        function openCopyright() {
+            document.getElementById('copyrightModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextExercise();
+            if (e.key === 'ArrowLeft') prevExercise();
+            if (e.key === 'Escape') {
+                closeModal('solutionModal');
+                closeModal('copyrightModal');
+            }
+        });
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
