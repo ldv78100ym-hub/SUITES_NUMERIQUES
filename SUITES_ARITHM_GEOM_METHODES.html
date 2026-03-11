@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Méthodes : Suites Arithmétiques et Géométriques</title>
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-blue: #3498db;
+            --accent-red: #e74c3c;
+            --bg-color: #f9fbfd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--primary-color);
+            background-color: var(--bg-color);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-blue);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 30px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--accent-blue);
+        }
+
+        .card.geo {
+            border-top: 4px solid var(--accent-red);
+        }
+
+        .method-box {
+            background-color: #f1f8ff;
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .method-box.geo-box {
+            background-color: #fdf3f2;
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .canvas-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        canvas {
+            border: 1px solid #ddd;
+            background-color: #fff;
+            max-width: 100%;
+            border-radius: 4px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .legend-ari { color: var(--accent-blue); }
+        .legend-geo { color: var(--accent-red); }
+
+    </style>
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+    <h1>Méthodes d'étude des Suites</h1>
+
+    <div class="container">
+        <div class="card">
+            <h2>Suites Arithmétiques</h2>
+            <p>Une suite $(u_n)$ est arithmétique si l'on passe d'un terme au suivant en <strong>ajoutant</strong> toujours le même nombre $r$, appelé la raison.</p>
+            <p>Relation de récurrence : $$u_{n+1} = u_n + r$$</p>
+
+            <div class="method-box">
+                <h3>Méthode : Démontrer qu'une suite est arithmétique</h3>
+                <p>Pour prouver qu'une suite $(u_n)$ est arithmétique, il faut calculer la différence entre deux termes consécutifs :</p>
+                <ol>
+                    <li>Exprimer $u_{n+1}$ et $u_n$ en fonction de $n$.</li>
+                    <li>Calculer la différence $u_{n+1} - u_n$.</li>
+                    <li>Simplifier l'expression. Si le résultat est une constante (un nombre réel qui ne dépend plus de $n$), alors la suite est arithmétique de raison $r$.</li>
+                </ol>
+            </div>
+
+            <div class="method-box">
+                <h3>Méthode : Étudier les variations</h3>
+                <p>Le sens de variation d'une suite arithmétique dépend uniquement du signe de sa raison $r$ :</p>
+                <ul>
+                    <li>Si $r > 0$, la suite est <strong>strictement croissante</strong>.</li>
+                    <li>Si $r < 0$, la suite est <strong>strictement décroissante</strong>.</li>
+                    <li>Si $r = 0$, la suite est <strong>constante</strong>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card geo">
+            <h2>Suites Géométriques</h2>
+            <p>Une suite $(v_n)$ est géométrique si l'on passe d'un terme au suivant en <strong>multipliant</strong> toujours par le même nombre $q$, appelé la raison.</p>
+            <p>Relation de récurrence : $$v_{n+1} = v_n \times q$$</p>
+
+            <div class="method-box geo-box">
+                <h3>Méthode : Démontrer qu'une suite est géométrique</h3>
+                <p>Pour prouver qu'une suite $(v_n)$ dont les termes sont non nuls est géométrique :</p>
+                <ol>
+                    <li>Calculer le quotient $\frac{v_{n+1}}{v_n}$.</li>
+                    <li>Simplifier l'expression. Si le résultat est une constante $q$ (indépendante de $n$), alors la suite est géométrique de raison $q$.</li>
+                </ol>
+                <p><em>Alternative (si un terme peut être nul) :</em> Montrer qu'on peut écrire $v_{n+1} = q \times v_n$ où $q$ est une constante réelle.</p>
+            </div>
+
+            <div class="method-box geo-box">
+                <h3>Méthode : Étudier les variations</h3>
+                <p>Pour étudier les variations d'une suite géométrique, on étudie le signe de la différence $v_{n+1} - v_n$ :</p>
+                <p>$$v_{n+1} - v_n = v_n \times q - v_n = v_n(q - 1)$$</p>
+                <p>Il faut donc étudier le signe de $v_n$ et le comparer à la position de $q$ par rapport à $1$.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <h2>Représentation Graphique des Suites</h2>
+        <p>Visualisation des premiers termes par récurrence.</p>
+        <canvas id="sequenceCanvas" width="800" height="400"></canvas>
+        <div class="legend">
+            <span class="legend-ari">● Suite Arithmétique ($u_0=2$, $r=3$)</span>
+            <span class="legend-geo">● Suite Géométrique ($v_0=2$, $q=1.5$)</span>
+        </div>
+    </div>
+
+    <script>
+        // Script pour dessiner les suites sur le Canvas
+        window.onload = function() {
+            const canvas = document.getElementById('sequenceCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Dimensions et marges
+            const width = canvas.width;
+            const height = canvas.height;
+            const marginX = 40;
+            const marginY = 40;
+            const plotWidth = width - marginX * 2;
+            const plotHeight = height - marginY * 2;
+            
+            // Paramètres des suites
+            const n_max = 10;
+            let u = 2; // Premier terme arithmétique
+            const r = 3; // Raison arithmétique
+            
+            let v = 2; // Premier terme géométrique
+            const q = 1.5; // Raison géométrique
+
+            // Génération des données par récurrence (pas de formule explicite !)
+            const dataAri = [];
+            const dataGeo = [];
+            
+            let currentU = u;
+            let currentV = v;
+            let maxY = 0;
+
+            for (let n = 0; n <= n_max; n++) {
+                dataAri.push(currentU);
+                dataGeo.push(currentV);
+                
+                if (currentU > maxY) maxY = currentU;
+                if (currentV > maxY) maxY = currentV;
+                
+                // Calcul du terme suivant par récurrence
+                currentU = currentU + r;
+                currentV = currentV * q;
+            }
+
+            // Arrondir maxY pour l'échelle
+            maxY = Math.ceil(maxY / 10) * 10;
+
+            // Fonction pour dessiner les axes
+            function drawAxes() {
+                ctx.beginPath();
+                ctx.strokeStyle = '#95a5a6';
+                ctx.lineWidth = 2;
+                
+                // Axe X
+                ctx.moveTo(marginX, height - marginY);
+                ctx.lineTo(width - marginX + 20, height - marginY);
+                
+                // Axe Y
+                ctx.moveTo(marginX, height - marginY);
+                ctx.lineTo(marginX, marginY - 20);
+                ctx.stroke();
+
+                // Flèches
+                ctx.beginPath();
+                ctx.fillStyle = '#95a5a6';
+                ctx.moveTo(width - marginX + 20, height - marginY);
+                ctx.lineTo(width - marginX + 10, height - marginY - 5);
+                ctx.lineTo(width - marginX + 10, height - marginY + 5);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(marginX, marginY - 20);
+                ctx.lineTo(marginX - 5, marginY - 10);
+                ctx.lineTo(marginX + 5, marginY - 10);
+                ctx.fill();
+
+                // Labels des axes
+                ctx.fillStyle = '#2c3e50';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('n', width - marginX + 10, height - marginY + 20);
+                ctx.fillText('Valeur', marginX - 35, marginY - 25);
+            }
+
+            // Fonction pour dessiner les points
+            function plotPoints(data, color) {
+                ctx.fillStyle = color;
+                for (let i = 0; i < data.length; i++) {
+                    const x = marginX + (i / n_max) * plotWidth;
+                    const y = height - marginY - (data[i] / maxY) * plotHeight;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    // Ligne pointillée vers l'axe X (facultatif)
+                    ctx.beginPath();
+                    ctx.strokeStyle = color + '40'; // Transparence
+                    ctx.setLineDash([2, 4]);
+                    ctx.moveTo(x, height - marginY);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+
+            // Dessin
+            drawAxes();
+            plotPoints(dataAri, '#3498db'); // Bleu pour arithmétique
+            plotPoints(dataGeo, '#e74c3c'); // Rouge pour géométrique
+
+            // Graduation axe X
+            ctx.fillStyle = '#7f8c8d';
+            ctx.font = '12px sans-serif';
+            for (let i = 0; i <= n_max; i++) {
+                const x = marginX + (i / n_max) * plotWidth;
+                ctx.fillText(i, x - 4, height - marginY + 15);
+            }
+        };
+    </script>
+</body>
+</html>
