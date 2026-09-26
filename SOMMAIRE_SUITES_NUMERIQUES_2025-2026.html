@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ressources – Suites Numériques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f4f7fb;
+            color: #1e2a3a;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0b2b4a;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #4a6078;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 20, 40, 0.06);
+            padding: 1.8rem 1.6rem 1.6rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e4edf5;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 20, 40, 0.10);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b2b4a;
+            margin-bottom: 0.7rem;
+            line-height: 1.4;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: #3d566e;
+            flex: 1;
+            margin-bottom: 1.4rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: #1a6fb5;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.4rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s ease, box-shadow 0.18s ease;
+            text-decoration: none;
+            align-self: flex-start;
+            box-shadow: 0 2px 8px rgba(26, 111, 181, 0.25);
+        }
+
+        .btn:hover {
+            background: #135a96;
+            box-shadow: 0 4px 14px rgba(26, 111, 181, 0.35);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3.5rem;
+            font-size: 0.85rem;
+            color: #7a8fa5;
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 1.2rem 0.8rem;
+            }
+            header h1 {
+                font-size: 1.7rem;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            .card {
+                padding: 1.4rem 1.2rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📘 Suites Numériques</h1>
+            <p>
+                Une collection de ressources interactives pour comprendre les suites numériques :
+                définitions, suites arithmétiques et géométriques, méthodes, variations
+                et simulations dynamiques.
+            </p>
+        </header>
+
+        <div class="grid">
+
+            <!-- 1. DEFINITIONS_SUITES_NUMERIQUES.html -->
+            <div class="card">
+                <h2>Modes de définition d’une suite numérique</h2>
+                <p>
+                    Présente les quatre façons de définir une suite : par liste exhaustive,
+                    par points sur un graphique, par formule explicite (polynômes, racines,
+                    trigo, expo) et par relation de récurrence.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/DEFINITIONS_SUITES_NUMERIQUES.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 2. SUITES_ARITHMETIQUES_EXERCICES.html -->
+            <div class="card">
+                <h2>Entraînement : Suites Arithmétiques</h2>
+                <p>
+                    Exercices variés : reconnaître une suite arithmétique, utiliser la formule
+                    explicite, prouver qu’une suite n’est pas arithmétique, résoudre un problème
+                    concret (économies de Paul) et s’entraîner pas à pas.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITES_ARITHMETIQUES_EXERCICES.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 3. SUITES_ARITHMETIQUES_EXERCICES_CONCEPTUALISES_VALEURS_DYNAMIQUE.html -->
+            <div class="card">
+                <h2>Suites Arithmétiques — Exercices dynamiques</h2>
+                <p>
+                    Exercice conceptualisé : modéliser l’évolution d’une population de bactéries
+                    et justifier rigoureusement s’il s’agit d’une suite arithmétique en analysant
+                    les différences entre termes successifs.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITES_ARITHMETIQUES_EXERCICES_CONCEPTUALISES_VALEURS_DYNAMIQUE.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 4. SUITES_ARITHM_GEOM_COURS.html -->
+            <div class="card">
+                <h2>Cours : Suites Arithmétiques et Géométriques</h2>
+                <p>
+                    Cours complet : définitions, formules de récurrence, sens de variation
+                    selon la raison (arithmétique) ou le quotient (géométrique), avec les
+                    propriétés essentielles.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITES_ARITHM_GEOM_COURS.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 5. SUITES_ARITHM_GEOM_METHODES.html -->
+            <div class="card">
+                <h2>Méthodes : Suites Arithmétiques et Géométriques</h2>
+                <p>
+                    Méthodes pas à pas : démontrer qu’une suite est arithmétique (calcul de
+                    u<sub>n+1</sub> − u<sub>n</sub>) ou géométrique (calcul du quotient),
+                    et étudier les variations.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITES_ARITHM_GEOM_METHODES.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 6. SUITES_GEOMETRIQUES_EXERCICES_CONCEPTUALISES_VALEURS_DYNAMIQUE.html -->
+            <div class="card">
+                <h2>Suites Géométriques — Exercices dynamiques</h2>
+                <p>
+                    Exercice conceptualisé : à partir d’une suite de nombres (7 ; 14 ; 21 ; 28),
+                    déterminer s’il s’agit d’une suite géométrique en calculant les rapports
+                    entre termes consécutifs.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITES_GEOMETRIQUES_EXERCICES_CONCEPTUALISES_VALEURS_DYNAMIQUE.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 7. SUITES_NUMERIQUES_LECONS.html -->
+            <div class="card">
+                <h2>Généralités sur les Suites Numériques</h2>
+                <p>
+                    Cours interactif : distinction entre (u<sub>n</sub>) et u<sub>n</sub>,
+                    importance de l’indice, modes de construction (liste, explicite,
+                    récurrence, graphique), différence rang/indice, et sens de variation.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITES_NUMERIQUES_LECONS.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 8. SUITE_ARITHMETIQUE_V2.html -->
+            <div class="card">
+                <h2>Suites Arithmétiques — Simulation dynamique</h2>
+                <p>
+                    Simulation en temps réel d’une suite arithmétique (u₁ = 12, r = 6) :
+                    évolution pas à pas, définition formelle, sens de variation et projection
+                    globale jusqu’à u₁₆.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITE_ARITHMETIQUE_V2.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 9. SUITE_GEOMETRIQUE_V2.html -->
+            <div class="card">
+                <h2>Suites Géométriques — Simulation dynamique</h2>
+                <p>
+                    Simulation en temps réel d’une suite géométrique (u₀ = 4, q = 0,8) :
+                    évolution par multiplication de la raison, définition formelle, sens de
+                    variation et allure exponentielle.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/SUITE_GEOMETRIQUE_V2.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+            <!-- 10. VARIATION_SUITES_NUMERIQUES.html -->
+            <div class="card">
+                <h2>Exercice : Sens de variation d’une suite</h2>
+                <p>
+                    Étude complète du signe de u<sub>n+1</sub> − u<sub>n</sub> pour la suite
+                    u<sub>n</sub> = n² + 10n + 5 (n ≥ 0), avec calcul détaillé et conclusion
+                    sur la croissance.
+                </p>
+                <button class="btn" onclick="window.open('https://ldv78100ym-hub.github.io/SUITES_NUMERIQUES/VARIATION_SUITES_NUMERIQUES.html', '_blank')">
+                    <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                    Ouvrir la ressource
+                </button>
+            </div>
+
+        </div>
+
+        <footer>
+            Ressources pédagogiques – Yann Merdy · Suites Numériques
+        </footer>
+    </div>
+</body>
+</html>
